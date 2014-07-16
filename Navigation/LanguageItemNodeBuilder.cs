@@ -67,8 +67,9 @@ namespace MonoDevelop.ValaBinding.Navigation
 		{
 			return ((Symbol)dataObject).Name;
 		}
-		
-		public override void BuildNode (ITreeBuilder treeBuilder,
+
+        // TODO: update for Xamarin Studio 5
+		/*public override void BuildNode (ITreeBuilder treeBuilder,
 		                                object dataObject,
 		                                ref string label,
 		                                ref Gdk.Pixbuf icon,
@@ -77,7 +78,7 @@ namespace MonoDevelop.ValaBinding.Navigation
 			Symbol c = (Symbol)dataObject;
 			label = c.DisplayText;
 			icon = Context.GetIcon (c.Icon);
-		}
+		}*/
 		
 		public override void BuildChildNodes (ITreeBuilder treeBuilder, object dataObject)
 		{

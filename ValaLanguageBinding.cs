@@ -37,8 +37,6 @@ using Mono.Addins;
 
 using MonoDevelop.Projects;
 using MonoDevelop.Core;
-using MonoDevelop.Projects.Dom.Parser;
-using MonoDevelop.Projects.CodeGeneration;
 
 namespace MonoDevelop.ValaBinding
 {
@@ -59,17 +57,21 @@ namespace MonoDevelop.ValaBinding
 			        ext.Equals(".vapi", StringComparison.OrdinalIgnoreCase));
 		}
 		
-		public IParser Parser {
-			get { return null; }
-		}
-		
-		public IRefactorer Refactorer {
-			get { return null; }
-		}
-		
 		public string GetFileName (string baseName)
 		{
 			return baseName + ".vala";
 		}
-	}
+
+        // TODO: update for Xamarin Studio 5
+        public FilePath GetFileName(FilePath fileNameWithoutExtension)
+        {
+            return new FilePath(fileNameWithoutExtension.FullPath + ".vala");
+        }
+
+        // TODO: update for Xamarin Studio 5
+        public bool IsSourceCodeFile(FilePath fileName)
+        {
+            return IsSourceCodeFile(fileName.FileName);
+        }
+    }
 }

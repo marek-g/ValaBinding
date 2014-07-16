@@ -43,6 +43,7 @@ using MonoDevelop.Ide.CodeCompletion;
 
 using MonoDevelop.ValaBinding.Parser;
 using MonoDevelop.ValaBinding.Parser.Afrodite;
+using ICSharpCode.NRefactory.Completion;
 
 namespace MonoDevelop.ValaBinding
 {
@@ -181,7 +182,49 @@ namespace MonoDevelop.ValaBinding
 			}
 			return 0;
 		}
-	}
+
+        // TODO: update for Xamarin Studio 5
+        public bool AllowParameterList(int overload)
+        {
+            return false;
+        }
+
+        // TODO: update for Xamarin Studio 5
+        public int Count
+        {
+            get { return 0; }
+        }
+
+        // TODO: update for Xamarin Studio 5
+        public string GetDescription(int overload, int currentParameter)
+        {
+            return "";
+        }
+
+        // TODO: update for Xamarin Studio 5
+        public string GetHeading(int overload, string[] parameterDescription, int currentParameter)
+        {
+            return "";
+        }
+
+        // TODO: update for Xamarin Studio 5
+        public string GetParameterDescription(int overload, int paramIndex)
+        {
+            return "";
+        }
+
+        // TODO: update for Xamarin Studio 5
+        public string GetParameterName(int overload, int currentParameter)
+        {
+            return "";
+        }
+
+        // TODO: update for Xamarin Studio 5
+        public int StartOffset
+        {
+            get { return 0; }
+        }
+    }
 	
 	/// <summary>
 	/// Data for Vala completion

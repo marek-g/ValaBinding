@@ -42,8 +42,6 @@ using MonoDevelop.Ide;
 using MonoDevelop.Ide.Gui;
 using MonoDevelop.Ide.Gui.Content;
 using MonoDevelop.Ide.CodeCompletion;
-using MonoDevelop.Projects.Dom;
-using MonoDevelop.Projects.Dom.Output;
 
 using MonoDevelop.Core;
 using MonoDevelop.Components;
@@ -51,6 +49,7 @@ using MonoDevelop.Components;
 using Gtk;
 
 using MonoDevelop.ValaBinding.Parser;
+using Mono.TextEditor;
 
 namespace MonoDevelop.ValaBinding
 {
@@ -78,7 +77,8 @@ namespace MonoDevelop.ValaBinding
 		
 		public override bool KeyPress (Gdk.Key key, char keyChar, Gdk.ModifierType modifier)
 		{
-			string lineText = Editor.GetLineText (Editor.Caret.Line);
+            // TODO: update for Xamarin Studio 5
+			/*string lineText = Editor.GetLineText (Editor.Caret.Line);
 			
 			// smart formatting strategy
 			if (TextEditorProperties.IndentStyle == IndentStyle.Smart) {
@@ -95,7 +95,7 @@ namespace MonoDevelop.ValaBinding
 					Editor.Replace (lineSegment.Offset, lineSegment.EditableLength, lineText + "}");
 					return false;
 				}
-			}
+			}*/
 			
 			return base.KeyPress (key, keyChar, modifier);
 		}
@@ -104,8 +104,9 @@ namespace MonoDevelop.ValaBinding
 		/// Expression to match instance construction/initialization
 		/// </summary>
 		private static Regex initializationRegex = new Regex (@"(((?<typename>\w[\w\d\.<>]*)\s+)?(?<variable>\w[\w\d]*)\s*=\s*)?new\s*(?<constructor>\w[\w\d\.<>]*)?", RegexOptions.Compiled);
-		
-		public override ICompletionDataList HandleCodeCompletion (
+
+        // TODO: update for Xamarin Studio 5 (no suitable method found to override)
+		public /*override*/ ICompletionDataList HandleCodeCompletion (
 		    CodeCompletionContext completionContext, char completionChar)
 		{
 			string lineText = null;
@@ -241,8 +242,9 @@ namespace MonoDevelop.ValaBinding
 			});
 			return list;
 		}
-		
-		public override  IParameterDataProvider HandleParameterCompletion (
+
+        // TODO: update for Xamarin Studio 5
+		/*public override  IParameterDataProvider HandleParameterCompletion (
 		    CodeCompletionContext completionContext, char completionChar)
 		{
 			if (completionChar != '(')
@@ -298,7 +300,7 @@ namespace MonoDevelop.ValaBinding
 			int nameStart = lineText.LastIndexOfAny (allowedChars) + 1;
 			functionName = lineText.Substring (nameStart).Trim ();
 			return (string.IsNullOrEmpty (functionName)? null: new ParameterDataProvider (Document, info, functionName));
-		}
+		}*/
 		
 		private bool AllWhiteSpace (string lineText)
 		{
@@ -312,7 +314,8 @@ namespace MonoDevelop.ValaBinding
 		#region IPathedDocument implementation
 		public event EventHandler<DocumentPathChangedEventArgs> PathChanged;
 
-		public Gtk.Widget CreatePathWidget (int index)
+        // TODO: update for Xamarin Studio 5
+		public Widget CreatePathWidget (int index)
 		{
 			PathEntry[] path = CurrentPath;
 			if (null == path || 0 > index || path.Length <= index) {
@@ -321,11 +324,11 @@ namespace MonoDevelop.ValaBinding
 			
 			object tag = path[index].Tag;
 			DropDownBoxListWindow.IListDataProvider provider = null;
-			if (tag is ICompilationUnit) {
+			//if (tag is ICompilationUnit) {
 				provider = new CompilationUnitDataProvider (Document);
-			} else {
-				provider = new DataProvider (Document, tag, GetAmbience ());
-			}
+			//} else {
+				//provider = new DataProvider (Document, tag, GetAmbience ());
+			//}
 			
 			DropDownBoxListWindow window = new DropDownBoxListWindow (provider);
 			window.SelectItem (tag);
@@ -346,9 +349,10 @@ namespace MonoDevelop.ValaBinding
 		#endregion
 		
 		// Yoinked from C# binding
-		void UpdatePath (object sender, Mono.TextEditor.TextDocumentLocationEventArgs e)
+		void UpdatePath (object sender, DocumentLocationEventArgs e)
 		{
-			var unit = Document.CompilationUnit;
+            // TODO: update for Xamarin Studio 5
+			/*var unit = Document.CompilationUnit;
 			if (unit == null)
 				return;
 				
@@ -400,7 +404,7 @@ namespace MonoDevelop.ValaBinding
 			
 			var prev = CurrentPath;
 			CurrentPath = result.ToArray ();
-			OnPathChanged (new DocumentPathChangedEventArgs (prev));
+			OnPathChanged (new DocumentPathChangedEventArgs (prev));*/
 		}
 		
 		public override void Initialize ()
@@ -413,12 +417,13 @@ namespace MonoDevelop.ValaBinding
 		}
 		
 		// Yoinked from C# binding
-		class CustomNode : MonoDevelop.Projects.Dom.AbstractNode
+        // TODO: update for Xamarin Studio 5
+		/*class CustomNode : MonoDevelop.Projects.Dom.AbstractNode
 		{
 			public CustomNode (INode parent)
 			{
 				this.Parent = parent;
 			}
-		}
-	}
+		}*/
+    }
 }

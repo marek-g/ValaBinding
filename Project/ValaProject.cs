@@ -173,10 +173,6 @@ namespace MonoDevelop.ValaBinding
 			}
 		}
 		
-		public override string ProjectType {
-			get { return "Vala"; }
-		}
-		
 		public override string[] SupportedLanguages {
 			get { return new string[] { "Vala" }; }
 		}
@@ -543,5 +539,10 @@ namespace MonoDevelop.ValaBinding
 				}// add compilation parameters and LD_LIBRARY_PATH
 			} catch { /* Do anything here? */ }
 		}// AddDependencies
-	}
+
+        public override IEnumerable<string> GetProjectTypes()
+        {
+            return new string[] { "Vala" };
+        }
+    }
 }

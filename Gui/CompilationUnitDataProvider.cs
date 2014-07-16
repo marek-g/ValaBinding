@@ -35,7 +35,6 @@ using MonoDevelop.Ide.Gui;
 using MonoDevelop.Ide.Gui.Content;
 using MonoDevelop.Ide.CodeCompletion;
 using MonoDevelop.Components;
-using MonoDevelop.Projects.Dom;
 
 using Gtk;
 
@@ -58,29 +57,31 @@ namespace MonoDevelop.ValaBinding
 		{
 			return Document.ParsedDocument.UserRegions.ElementAt (n).Name;
 		}// GetText
-		
-		internal static Gdk.Pixbuf Pixbuf
+
+        internal static Image Pixbuf
 		{
-			get { return ImageService.GetPixbuf (Gtk.Stock.Add, IconSize.Menu); }
+			get { return ImageService.GetImage(Gtk.Stock.Add, IconSize.Menu); }
 		}// Pixbuf
-		
-		public Gdk.Pixbuf GetIcon (int n)
+
+        // TODO: update for Xamarin Studio 5
+        public Xwt.Drawing.Image GetIcon(int n)
 		{
-			return Pixbuf;
+            return null;
+			//return Pixbuf;
 		}// GetIcon
 		
 		public object GetTag (int n)
 		{
 			return Document.ParsedDocument.UserRegions.ElementAt (n);
 		}// GetTag
-		
-		
+
+        // TODO: update for Xamarin Studio 5
 		public void ActivateItem (int n)
 		{
 			var reg = Document.ParsedDocument.UserRegions.ElementAt (n);
 			MonoDevelop.Ide.Gui.Content.IExtensibleTextEditor extEditor = Document.GetContent<MonoDevelop.Ide.Gui.Content.IExtensibleTextEditor> ();
-			if (extEditor != null)
-				extEditor.SetCaretTo (Math.Max (1, reg.Region.Start.Line), reg.Region.Start.Column);
+			/*if (extEditor != null)
+				extEditor.SetCaretTo (Math.Max (1, reg.Region.Start.Line), reg.Region.Start.Column);*/
 		}// ActivateItem
 		
 		public int IconCount
@@ -93,6 +94,6 @@ namespace MonoDevelop.ValaBinding
 		}// IconCount
 		
 		#endregion
-	}// CompilationUnitDataProvider
+    }// CompilationUnitDataProvider
 }
 

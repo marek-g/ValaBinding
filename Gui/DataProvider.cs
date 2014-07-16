@@ -35,15 +35,17 @@ using MonoDevelop.Ide.Gui;
 using MonoDevelop.Ide.Gui.Content;
 using MonoDevelop.Ide.CodeCompletion;
 using MonoDevelop.Components;
-using MonoDevelop.Projects.Dom;
-using MonoDevelop.Projects.Dom.Output;
 
 using Gtk;
+using MonoDevelop.Ide.TypeSystem;
+using ICSharpCode.NRefactory.TypeSystem;
+using ICSharpCode.NRefactory.PatternMatching;
 
 namespace MonoDevelop.ValaBinding
 {
 	// Yoinked from C# binding
-	public class DataProvider : DropDownBoxListWindow.IListDataProvider
+    // TODO: update for Xamarin Studio 5
+	/*public class DataProvider : DropDownBoxListWindow.IListDataProvider
 	{
 		object tag;
 		Ambience amb;
@@ -113,6 +115,6 @@ namespace MonoDevelop.ValaBinding
 			}
 		}// IconCount
 		#endregion
-	}// DataProvider
+	}// DataProvider*/
 }
 

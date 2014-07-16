@@ -55,6 +55,8 @@ namespace MonoDevelop.ValaBinding.Navigation
 			
 			if (null != item && 0 < item.SourceReferences.Count) {
 				SourceReference reference = item.SourceReferences[0];
+
+                // TODO: update for Xamarin Studio 5 (obsolete)
 				IdeApp.Workbench.OpenDocument (reference.File, reference.FirstLine, reference.FirstColumn);
 			}
 		}

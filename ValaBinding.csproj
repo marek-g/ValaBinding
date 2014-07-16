@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -9,7 +9,8 @@
     <OutputType>Library</OutputType>
     <AssemblyName>MonoDevelop.ValaBinding</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <ApplicationIcon>.</ApplicationIcon>
+    <ApplicationIcon>
+    </ApplicationIcon>
     <RootNamespace>MonoDevelop.ValaBinding</RootNamespace>
     <AssemblyOriginatorKeyFile>.</AssemblyOriginatorKeyFile>
   </PropertyGroup>
@@ -39,6 +40,81 @@
     </Execution>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="ICSharpCode.NRefactory">
+      <HintPath>dlls\ICSharpCode.NRefactory.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Addins">
+      <HintPath>dlls\Mono.Addins.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Cecil">
+      <HintPath>dlls\Mono.Cecil.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Debugger.Soft">
+      <HintPath>dlls\Mono.Debugger.Soft.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Debugging">
+      <HintPath>dlls\Mono.Debugging.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Debugging.Soft">
+      <HintPath>dlls\Mono.Debugging.Soft.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.TextEditor">
+      <HintPath>dlls\Mono.TextEditor.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoDevelop.AspNet">
+      <HintPath>dlls\MonoDevelop.AspNet.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoDevelop.Autotools">
+      <HintPath>dlls\MonoDevelop.Autotools.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoDevelop.Core">
+      <HintPath>dlls\MonoDevelop.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoDevelop.CSharpBinding">
+      <HintPath>dlls\MonoDevelop.CSharpBinding.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoDevelop.Debugger">
+      <HintPath>dlls\MonoDevelop.Debugger.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoDevelop.Debugger.Soft">
+      <HintPath>dlls\MonoDevelop.Debugger.Soft.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoDevelop.Deployment">
+      <HintPath>dlls\MonoDevelop.Deployment.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoDevelop.Deployment.Linux">
+      <HintPath>dlls\MonoDevelop.Deployment.Linux.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoDevelop.DesignerSupport">
+      <HintPath>dlls\MonoDevelop.DesignerSupport.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoDevelop.Gettext">
+      <HintPath>dlls\MonoDevelop.Gettext.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoDevelop.GtkCore">
+      <HintPath>dlls\MonoDevelop.GtkCore.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoDevelop.Ide">
+      <HintPath>dlls\MonoDevelop.Ide.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoDevelop.NUnit">
+      <HintPath>dlls\MonoDevelop.NUnit.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoDevelop.Refactoring">
+      <HintPath>dlls\MonoDevelop.Refactoring.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoDevelop.SourceEditor2">
+      <HintPath>dlls\MonoDevelop.SourceEditor2.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoDevelop.VBNetBinding">
+      <HintPath>dlls\MonoDevelop.VBNetBinding.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoDevelop.VersionControl">
+      <HintPath>dlls\MonoDevelop.VersionControl.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoDevelop.XmlEditor">
+      <HintPath>dlls\MonoDevelop.XmlEditor.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Xml" />
     <Reference Include="Mono.Posix" />
@@ -47,81 +123,9 @@
     <Reference Include="glib-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
     <Reference Include="gtk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
     <Reference Include="pango-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
-    <Reference Include="Mono.Addins, Version=0.3.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756" />
-    <Reference Include="MonoDevelop.VersionControl, Version=1.9.2.0, Culture=neutral">
-      <Package>monodevelop-core-addins</Package>
-    </Reference>
-    <Reference Include="MonoDevelop.NUnit, Version=1.9.2.0, Culture=neutral">
-      <Package>monodevelop-core-addins</Package>
-    </Reference>
-    <Reference Include="MonoDevelop.XmlEditor, Version=1.9.2.0, Culture=neutral">
-      <Package>monodevelop-core-addins</Package>
-    </Reference>
-    <Reference Include="MonoDevelop.AspNet, Version=1.9.2.0, Culture=neutral">
-      <Package>monodevelop-core-addins</Package>
-    </Reference>
-    <Reference Include="MonoDevelop.Gettext, Version=1.9.2.0, Culture=neutral">
-      <Package>monodevelop-core-addins</Package>
-    </Reference>
-    <Reference Include="MonoDevelop.Deployment, Version=1.9.2.0, Culture=neutral">
-      <Package>monodevelop-core-addins</Package>
-    </Reference>
-    <Reference Include="MonoDevelop.Deployment.Linux, Version=1.9.2.0, Culture=neutral">
-      <Package>monodevelop-core-addins</Package>
-    </Reference>
-    <Reference Include="MonoDevelop.GtkCore, Version=1.9.2.0, Culture=neutral">
-      <Package>monodevelop-core-addins</Package>
-    </Reference>
-    <Reference Include="MonoDevelop.DesignerSupport, Version=1.9.2.0, Culture=neutral">
-      <Package>monodevelop-core-addins</Package>
-    </Reference>
-    <Reference Include="MonoDevelop.VBNetBinding, Version=1.9.2.0, Culture=neutral">
-      <Package>monodevelop-core-addins</Package>
-    </Reference>
-    <Reference Include="MonoDevelop.CBinding, Version=1.9.2.0, Culture=neutral">
-      <Package>monodevelop-core-addins</Package>
-    </Reference>
-    <Reference Include="MonoDevelop.CSharpBinding, Version=1.9.2.0, Culture=neutral">
-      <Package>monodevelop-core-addins</Package>
-    </Reference>
-    <Reference Include="MonoDevelop.Autotools, Version=1.9.2.0, Culture=neutral">
-      <Package>monodevelop-core-addins</Package>
-    </Reference>
-    <Reference Include="MonoDevelop.Core, Version=1.9.2.0, Culture=neutral">
-      <Package>monodevelop</Package>
-    </Reference>
-    <Reference Include="MonoDevelop.Ide, Version=1.9.2.0, Culture=neutral">
-      <Package>monodevelop</Package>
-    </Reference>
-    <Reference Include="NRefactory, Version=0.0.0.0, Culture=neutral">
-      <Package>monodevelop</Package>
-    </Reference>
-    <Reference Include="Mono.Cecil, Version=0.6.8.8607, Culture=neutral">
-      <Package>monodevelop</Package>
-    </Reference>
-    <Reference Include="Mono.TextEditor, Version=1.0.0.0, Culture=neutral">
-      <Package>monodevelop</Package>
-    </Reference>
-    <Reference Include="MonoDevelop.SourceEditor2, Version=2.1.0.0, Culture=neutral">
-      <Package>monodevelop-core-addins</Package>
-    </Reference>
-    <Reference Include="MonoDevelop.Debugger, Version=2.1.0.0, Culture=neutral">
-      <Package>monodevelop-core-addins</Package>
-    </Reference>
-    <Reference Include="MonoDevelop.Refactoring, Version=2.1.0.0, Culture=neutral">
-      <Package>monodevelop-core-addins</Package>
-    </Reference>
-    <Reference Include="MonoDevelop.Debugger.Soft, Version=2.2.0.0, Culture=neutral">
-      <Package>monodevelop-core-addins</Package>
-    </Reference>
-    <Reference Include="Mono.Debugger.Soft, Version=0.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756">
-      <Package>monodevelop-core-addins</Package>
-    </Reference>
-    <Reference Include="Mono.Debugging.Soft, Version=0.0.0.0, Culture=neutral, PublicKeyToken=5e9ce85b0923c84f">
-      <Package>monodevelop-core-addins</Package>
-    </Reference>
-    <Reference Include="Mono.Debugging, Version=0.0.0.0, Culture=neutral, PublicKeyToken=5e9ce85b0923c84f">
-      <Package>monodevelop</Package>
+    <Reference Include="Xwt, Version=0.1.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>dlls\Xwt.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -232,6 +236,35 @@
     <Compile Include="Gui\ParameterDataProvider.cs" />
     <Compile Include="Gui\CompilationUnitDataProvider.cs" />
     <Compile Include="Gui\DataProvider.cs" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Content Include="dlls\ICSharpCode.NRefactory.dll" />
+    <Content Include="dlls\Mono.Addins.dll" />
+    <Content Include="dlls\Mono.Cecil.dll" />
+    <Content Include="dlls\Mono.Debugger.Soft.dll" />
+    <Content Include="dlls\Mono.Debugging.dll" />
+    <Content Include="dlls\Mono.Debugging.Soft.dll" />
+    <Content Include="dlls\Mono.TextEditor.dll" />
+    <Content Include="dlls\MonoDevelop.AspNet.dll" />
+    <Content Include="dlls\MonoDevelop.Autotools.dll" />
+    <Content Include="dlls\MonoDevelop.Core.dll" />
+    <Content Include="dlls\MonoDevelop.CSharpBinding.dll" />
+    <Content Include="dlls\MonoDevelop.Debugger.dll" />
+    <Content Include="dlls\MonoDevelop.Debugger.Soft.dll" />
+    <Content Include="dlls\MonoDevelop.Deployment.dll" />
+    <Content Include="dlls\MonoDevelop.Deployment.Linux.dll" />
+    <Content Include="dlls\MonoDevelop.DesignerSupport.dll" />
+    <Content Include="dlls\MonoDevelop.Gettext.dll" />
+    <Content Include="dlls\MonoDevelop.GtkCore.dll" />
+    <Content Include="dlls\MonoDevelop.Ide.dll" />
+    <Content Include="dlls\MonoDevelop.NUnit.dll" />
+    <Content Include="dlls\MonoDevelop.Refactoring.dll" />
+    <Content Include="dlls\MonoDevelop.SourceEditor2.dll" />
+    <Content Include="dlls\MonoDevelop.VBNetBinding.dll" />
+    <Content Include="dlls\MonoDevelop.VersionControl.dll" />
+    <Content Include="dlls\MonoDevelop.XmlEditor.dll" />
+    <Content Include="dlls\Xwt.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

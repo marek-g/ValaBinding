@@ -60,8 +60,9 @@ namespace MonoDevelop.ValaBinding.ProjectPad
 		public override string ContextMenuAddinPath {
 			get { return "/MonoDevelop/ValaBinding/Views/ProjectBrowser/ContextMenu/PackageNode"; }
 		}
-		
-		public override void BuildNode (ITreeBuilder treeBuilder,
+
+        // TODO: update for Xamarin Studio 5
+		/*public override void BuildNode (ITreeBuilder treeBuilder,
 		                                object dataObject,
 		                                ref string label,
 		                                ref Gdk.Pixbuf icon,
@@ -73,7 +74,7 @@ namespace MonoDevelop.ValaBinding.ProjectPad
 				icon = new Gdk.Pixbuf (Assembly.GetExecutingAssembly (), "Icons.16x16.ProjectReference");
 			else
 				icon = Context.GetIcon (Stock.Reference);
-		}
+		}*/
 	}
 	
 	public class PackageNodeCommandHandler : NodeCommandHandler

@@ -29,9 +29,6 @@ using System.IO;
 using System.Collections.Generic;
 using System.Threading;
 
-using MonoDevelop.Projects.Dom;
-using MonoDevelop.Projects.Dom.Parser;
-
 using MonoDevelop.ValaBinding.Parser.Afrodite;
 
 namespace MonoDevelop.ValaBinding.Parser
@@ -39,7 +36,8 @@ namespace MonoDevelop.ValaBinding.Parser
 	/// <summary>
 	/// Parser for Vala source and vapi files
 	/// </summary>
-	public class ValaDocumentParser: AbstractParser
+    // TODO: update for Xamarin Studio 5
+	/*public class ValaDocumentParser: AbstractParser
 	{
 		private ParsedDocument lastGood;
 		
@@ -113,5 +111,5 @@ namespace MonoDevelop.ValaBinding.Parser
 			
 			return (lastGood = doc);
 		}// Parse
-	}// ValaDocumentParser
+	}// ValaDocumentParser*/
 }

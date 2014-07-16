@@ -6,11 +6,11 @@
        url         = "http://www.monodevelop.com"
        description = "Vala Language binding"
        category    = "Language bindings"
-       version     = "4.2.3">
+       version     = "5.0.1">
 
 	<Dependencies>
-		<Addin id = "Core" version = "4.2.3"/>
-		<Addin id = "Ide" version = "4.2.3"/>
+		<Addin id = "Core" version = "5.0.1"/>
+		<Addin id = "Ide" version = "5.0.1"/>
 		<Addin id = "Deployment" version = "4.2.3"/>
 		<Addin id = "Deployment.Linux" version = "4.2.3"/>
 		<Addin id = "Autotools" version = "4.2.3"/>
