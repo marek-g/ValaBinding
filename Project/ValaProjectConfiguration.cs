@@ -107,8 +107,19 @@ namespace MonoDevelop.ValaBinding
 				case CompileTarget.SharedLibrary:
 					if (!Output.StartsWith ("lib"))
 						prefix = "lib";
-					if (!Output.EndsWith (".so"))
-						suffix = ".so";
+                    if (MonoDevelop.Core.Platform.IsWindows)
+                    {
+                        if (!Output.EndsWith(".dll"))
+                            suffix = ".dll";
+                    }
+                    else
+                    {
+                        if (!Output.EndsWith(".so"))
+                        {
+                            suffix = ".so";
+                        }
+                    }
+
 					break;
 				}
 				

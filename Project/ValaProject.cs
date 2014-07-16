@@ -518,7 +518,7 @@ namespace MonoDevelop.ValaBinding
 				}
 
 				// Currently, we need to add include directory and linker flags - this should be obsoleted
-				string ccargs = string.Format (" --Xcc=\\\\\\\"-I{0}\\\\\\\" --Xcc=\\\\\\\"-L{0}\\\\\\\" --Xcc=\\\\\\\"-l{1}\\\\\\\" ", Path.GetDirectoryName (depsfile), package.Name);
+				string ccargs = string.Format (" --Xcc=-I\"{0}\" --Xcc=-L\"{0}\" --Xcc=-l\"{1}\" ", Path.GetDirectoryName (depsfile), package.Name);
 				string ldpath = string.Empty;
 				string packagePath = Path.GetDirectoryName(package.File);
 				

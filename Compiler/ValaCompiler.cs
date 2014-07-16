@@ -188,7 +188,7 @@ namespace MonoDevelop.ValaBinding
 			ValaCompilationParameters cp =
 				(ValaCompilationParameters)configuration.CompilationParameters;
 
-			args.Add (string.Format ("-d '{0}'", configuration.OutputDirectory));
+			args.Add (string.Format ("-d \"{0}\"", configuration.OutputDirectory));
 			
 			if (configuration.DebugMode)
 				args.Add ("-g");
@@ -200,7 +200,14 @@ namespace MonoDevelop.ValaBinding
 				}
 				break;
 			case ValaBinding.CompileTarget.SharedLibrary:
-				args.Add (string.Format ("--Xcc=\"-shared\" --Xcc=\"-fPIC\" --Xcc=\"-I'{0}'\" -H \"{1}.h\" --library \"{1}\"", configuration.OutputDirectory, configuration.Output));
+                if (Platform.IsWindows)
+                {
+                    args.Add(string.Format("--Xcc=\"-shared\" --Xcc=-I\"{0}\" -H \"{1}.h\" --library \"{1}\"", configuration.OutputDirectory, configuration.Output));
+                }
+                else
+                {
+                    args.Add(string.Format("--Xcc=\"-shared\" --Xcc=\"-fPIC\" --Xcc=\"-I'{0}'\" -H \"{1}.h\" --library \"{1}\"", configuration.OutputDirectory, configuration.Output));
+                }
 				break;
 			}
 
@@ -226,7 +233,7 @@ namespace MonoDevelop.ValaBinding
 			}
 			
 			if (cp.ExtraCompilerArguments != null && cp.ExtraCompilerArguments.Length > 0) {
-				args.Add (ExpandBacktickedParameters (cp.ExtraCompilerArguments.Replace (Environment.NewLine, " ")));
+				args.Add(cp.ExtraCompilerArguments.Replace(Environment.NewLine, " "));
 			}
 			
 			if (cp.DefineSymbols != null && cp.DefineSymbols.Length > 0) {
@@ -580,34 +587,6 @@ namespace MonoDevelop.ValaBinding
 			}
 			
 			return null;
-		}
-
-		/// <summary>
-		/// Expands backticked portions of the parameter-list using "sh" and "echo"
-		/// </summary>
-		/// <param name="tmp">
-		/// The string to expand
-		/// <see cref="System.String"/>
-		/// </param>
-		/// <returns>
-		/// The result of the expansion
-		/// <see cref="System.String"/>
-		/// </returns> 
-		// TODO: Portability, although otoh, probably someone who doesn't have sh 
-		// isn't going to put backticks in the compiler flags
-		public static string ExpandBacktickedParameters (string tmp)
-		{
-			string parameters = "-c \"echo -n " + tmp + "\"";
-			Process p = new Process ();
-			
-			p.StartInfo.FileName = "sh";
-			p.StartInfo.Arguments = parameters;
-			p.StartInfo.UseShellExecute = false;
-			p.StartInfo.RedirectStandardOutput = true;
-			p.Start ();
-			p.WaitForExit ();
-
-			return p.StandardOutput.ReadToEnd ();
 		}
 		
 		/// <summary>
