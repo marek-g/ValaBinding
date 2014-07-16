@@ -500,11 +500,15 @@ namespace MonoDevelop.ValaBinding
 			foreach (Regex regex in new Regex[]{errorRegex, gccRegex})
 				if ((errorMatch = regex.Match (errorString)).Success)
 					break;
+
+            CompilerError error = new CompilerError();
 			
 			if (!errorMatch.Success)
-				return null;
-
-			CompilerError error = new CompilerError ();
+            {
+                // MG: error line doesn't match but do not ignore it
+                error.ErrorText = errorString;
+                return error;
+            }
 			
 			foreach (ProjectFile pf in projectFiles) {
 				if (Path.GetFileName (pf.Name) == errorMatch.Groups["file"].Value) {
