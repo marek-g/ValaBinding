@@ -103,10 +103,12 @@ namespace MonoDevelop.ValaBinding
 			extraCompilerTextView.Buffer.Text = compilationParameters.ExtraCompilerArguments;
 			
 			defineSymbolsTextEntry.Text = compilationParameters.DefineSymbols;
-			
+
+            libStore.Clear();
 			foreach (string lib in configuration.Libs)
 				libStore.AppendValues (lib);
-			
+
+            includePathStore.Clear();
 			foreach (string includePath in configuration.Includes)
 				includePathStore.AppendValues (includePath);
 		}
