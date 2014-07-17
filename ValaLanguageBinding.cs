@@ -49,29 +49,17 @@ namespace MonoDevelop.ValaBinding
 		public string SingleLineCommentTag { get { return "//"; } }
 		public string BlockCommentStartTag { get { return "/*"; } }
 		public string BlockCommentEndTag { get { return "*/"; } }
-		
-		public bool IsSourceCodeFile (string fileName)
-		{
-			string ext = Path.GetExtension(fileName);
-			return (ext.Equals(".vala", StringComparison.OrdinalIgnoreCase) ||
-			        ext.Equals(".vapi", StringComparison.OrdinalIgnoreCase));
-		}
-		
-		public string GetFileName (string baseName)
-		{
-			return baseName + ".vala";
-		}
 
-        // TODO: update for Xamarin Studio 5
-        public FilePath GetFileName(FilePath fileNameWithoutExtension)
-        {
-            return new FilePath(fileNameWithoutExtension.FullPath + ".vala");
-        }
-
-        // TODO: update for Xamarin Studio 5
         public bool IsSourceCodeFile(FilePath fileName)
         {
-            return IsSourceCodeFile(fileName.FileName);
+            string ext = Path.GetExtension(fileName);
+            return (ext.Equals(".vala", StringComparison.OrdinalIgnoreCase) ||
+                    ext.Equals(".vapi", StringComparison.OrdinalIgnoreCase));
+        }
+
+        public FilePath GetFileName(FilePath fileNameWithoutExtension)
+        {
+            return fileNameWithoutExtension + ".vala";
         }
     }
 }
