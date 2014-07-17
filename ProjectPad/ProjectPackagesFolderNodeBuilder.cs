@@ -84,13 +84,12 @@ namespace MonoDevelop.ValaBinding.ProjectPad
 			return "Packages";
 		}
 
-        // TODO: update for Xamarin Studio 5
-		/*public override void BuildNode (ITreeBuilder treeBuilder, object dataObject, ref string label, ref Gdk.Pixbuf icon, ref Gdk.Pixbuf closedIcon)
-		{			
-			label = "Packages";
-			icon = Context.GetIcon (Stock.OpenReferenceFolder);
-			closedIcon = Context.GetIcon (Stock.ClosedReferenceFolder);
-		}*/
+        public override void BuildNode(ITreeBuilder treeBuilder, object dataObject, NodeInfo nodeInfo)
+        {
+            nodeInfo.Label = "Packages";
+            nodeInfo.Icon = Context.GetIcon(Stock.OpenReferenceFolder);
+            nodeInfo.ClosedIcon = Context.GetIcon(Stock.ClosedReferenceFolder);
+        }
 		
 		public override bool HasChildNodes (ITreeBuilder builder, object dataObject)
 		{

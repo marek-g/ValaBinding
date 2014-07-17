@@ -18,6 +18,7 @@
 	
 	<Extension path = "/MonoDevelop/Core/StockIcons">
 		<StockIcon stockid = "md-union" resource = "Icons.16x16.Union"/>
+    <StockIcon stockid = "md-vala-project-reference" resource = "Icons.16x16.ProjectReference"/>
 		<StockIcon stockid = "md-protected-union" resource = "Icons.16x16.ProtectedUnion"/>
 		<StockIcon stockid = "md-private-union" resource = "Icons.16x16.PrivateUnion"/>
 		<StockIcon stockid = "md-vala-file" resource = "text-x-vala.16x16.png" />

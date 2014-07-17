@@ -58,6 +58,7 @@ FILES =  \
 	ProjectPad/ProjectPackageNodeBuilder.cs \
 	ProjectPad/ProjectPackagesFolderNodeBuilder.cs \
 	ProjectPad/ProjectReferencesExtension.cs \
+	Utils/FileUtils.cs \
 	ValaLanguageBinding.cs
 
 RES =  \
