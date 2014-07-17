@@ -130,7 +130,7 @@
                 <child>
                   <widget class="Gtk.SpinButton" id="optimizationSpinButton">
                     <property name="MemberName" />
-                    <property name="Sensitive">False</property>
+                    <property name="Sensitive">True</property>
                     <property name="CanFocus">True</property>
                     <property name="Upper">3</property>
                     <property name="PageIncrement">10</property>

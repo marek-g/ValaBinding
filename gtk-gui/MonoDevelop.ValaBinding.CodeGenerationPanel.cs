@@ -167,7 +167,7 @@ namespace MonoDevelop.ValaBinding
 			w4.YOptions = ((global::Gtk.AttachOptions)(4));
 			// Container child table1.Gtk.Table+TableChild
 			this.optimizationSpinButton = new global::Gtk.SpinButton (0, 3, 1);
-			this.optimizationSpinButton.Sensitive = false;
+			this.optimizationSpinButton.Sensitive = true;
 			this.optimizationSpinButton.CanFocus = true;
 			this.optimizationSpinButton.Name = "optimizationSpinButton";
 			this.optimizationSpinButton.Adjustment.PageIncrement = 10;
