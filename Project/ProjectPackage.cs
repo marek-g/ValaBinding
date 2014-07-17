@@ -39,6 +39,7 @@ using System.Collections.Generic;
 using Mono.Addins;
 
 using MonoDevelop.Core.Serialization;
+using MonoDevelop.Ide;
 
 namespace MonoDevelop.ValaBinding
 {
@@ -93,10 +94,10 @@ namespace MonoDevelop.ValaBinding
 		
 		public ProjectPackage (ValaProject project): this()
 		{
+            // for project packages only name is used as a reference
+            is_project = true;
 			name = project.Name;
-			ValaProjectConfiguration vpc = (ValaProjectConfiguration)(project.DefaultConfiguration);
-			file = Path.Combine (vpc.OutputDirectory, name + ".vapi");
-			is_project = true;
+            file = string.Empty;
 		}
 		
 		public string File {
@@ -119,15 +120,38 @@ namespace MonoDevelop.ValaBinding
 			ProjectPackage other = o as ProjectPackage;
 			
 			if (other == null) return false;
-			
-			return other.File.Equals (file);
+
+            return Object.Equals(File, other.File) &&
+                Object.Equals(IsProject, other.IsProject) &&
+                Object.Equals(Name, other.Name);
 		}
 		
 		public override int GetHashCode ()
 		{
-			return (file + name).GetHashCode ();
+            return (File == null ? 0 : File.GetHashCode()) ^
+                (Name == null ? 0 : Name.GetHashCode()) ^
+                IsProject.GetHashCode();
 		}
 		
+        public ValaProject GetProject()
+        {
+            if (!IsProject)
+            {
+                throw new Exception("Tried to get project from not project package.");
+            }
+
+            var projects = IdeApp.Workspace.GetAllProjects();
+            foreach (var p in projects)
+            {
+                if (p is ValaProject && p.Name == Name)
+                {
+                    return p as ValaProject;
+                }
+            }
+
+            return null;
+        }
+
 		/// <summary>
 		/// Insert '\n's to make sure string isn't too long.
 		/// </summary>

@@ -81,22 +81,33 @@ namespace MonoDevelop.ValaBinding
 		/// The string needed by the compiler to reference the necessary packages
 		/// <see cref="System.String"/>
 		/// </returns>
-		public static string GeneratePkgCompilerArgs (ProjectPackageCollection packages)
+		public static string GeneratePkgCompilerArgs(ProjectPackageCollection packages)
 		{
 			if (packages == null || packages.Count < 1)
 				return string.Empty;
 			
 			StringBuilder libs = new StringBuilder ();
 			
-			foreach (ProjectPackage p in packages) {
-				if (p.IsProject) {
-					libs.AppendFormat (" \"{0}\" ", p.File);
-				} else {
+			foreach (ProjectPackage p in packages)
+            {
+				if (p.IsProject)
+                {
+                    var proj = p.GetProject();
+
+                    // TODO: get configuration from solution's configuration mapping!
+                    var config = (ValaProjectConfiguration)proj.DefaultConfiguration;
+                    var vapifile = Path.Combine(config.OutputDirectory,
+                        Path.ChangeExtension(config.Output, ".vapi"));
+                    libs.AppendFormat(" --Xcc=-I\"{0}\" --Xcc=-L\"{0}\" --Xcc=-l\"{1}\" \"{2}\" ",
+                        Path.GetDirectoryName(vapifile), p.Name, vapifile);
+				}
+                else
+                {
 					libs.AppendFormat (" --pkg \"{0}\" ", p.Name);
 				}
 			}
 			
-			return libs.ToString ();
+			return libs.ToString();
 		}
 
 		/// <summary>
@@ -145,7 +156,8 @@ namespace MonoDevelop.ValaBinding
 			bool success = true;
 			
 			/// Build compiler params string
-			string compilerArgs = GetCompilerFlags (configuration) + " " + GeneratePkgCompilerArgs (packages);
+			string compilerArgs = GetCompilerFlags(configuration) + " " +
+                GeneratePkgCompilerArgs(packages);
 			
 			/// Build executable name
 			string outputName = Path.Combine (configuration.OutputDirectory,

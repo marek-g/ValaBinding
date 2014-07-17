@@ -508,14 +508,14 @@ namespace MonoDevelop.ValaBinding
 		}
 
 		/// <summary>
-		/// Add dependencies of project packages to current project,
-		/// and add cflags for project package and LD_LIBRARY_PATH
+		/// Add dependencies of project packages to current project.
 		/// </summary>
 		private void AddDependencies (object obj, ProjectPackageEventArgs args) {
 			ProjectPackage package = args.Package;
 			if (!package.IsProject){ return; }
 
-			string depsfile = Path.ChangeExtension (package.File, ".deps");
+            // TODO: for now user can do it manually
+			/*string depsfile = Path.ChangeExtension (package.File, ".deps");
 			try {
 				if (File.Exists (depsfile)) {
 					string[] lines = File.ReadAllLines (depsfile);
@@ -525,28 +525,7 @@ namespace MonoDevelop.ValaBinding
 					}// add package for each dep
 					packages.AddRange(deps);
 				}
-
-				// Currently, we need to add include directory and linker flags - this should be obsoleted
-				string ccargs = string.Format (" --Xcc=-I\"{0}\" --Xcc=-L\"{0}\" --Xcc=-l\"{1}\" ", Path.GetDirectoryName (depsfile), package.Name);
-				string ldpath = string.Empty;
-				string packagePath = Path.GetDirectoryName(package.File);
-				
-				foreach (ItemConfiguration pc in Configurations) {
-					ValaProjectConfiguration valapc = pc as ValaProjectConfiguration;
-					if (null == valapc){ continue; }
-
-					ValaCompilationParameters vcp = (ValaCompilationParameters)valapc.CompilationParameters;
-					if (!vcp.ExtraCompilerArguments.Contains (ccargs)){ vcp.ExtraCompilerArguments += ccargs; }
-
-					if(valapc.EnvironmentVariables.TryGetValue ("LD_LIBRARY_PATH", out ldpath)) {
-						if (!ldpath.Contains (packagePath)){ ldpath += Path.PathSeparator + packagePath; }
-					} else {
-						ldpath = packagePath;
-					}
-					
-					valapc.EnvironmentVariables["LD_LIBRARY_PATH"] = ldpath;
-				}// add compilation parameters and LD_LIBRARY_PATH
-			} catch { /* Do anything here? */ }
+			} catch { // Do anything here? } */
 		}// AddDependencies
 
         public override IEnumerable<string> GetProjectTypes()
