@@ -53,6 +53,7 @@ using MonoDevelop.Deployment;
 using MonoDevelop.Deployment.Linux;
 
 using MonoDevelop.ValaBinding.Parser;
+using MonoDevelop.ValaBinding.Utils;
 
 namespace MonoDevelop.ValaBinding
 {
@@ -397,18 +398,26 @@ namespace MonoDevelop.ValaBinding
 		protected override void OnFileAddedToProject (ProjectFileEventArgs args)
 		{
 			base.OnFileAddedToProject (args);
-			
-			foreach (ProjectFileEventInfo e in args) {
+
+			foreach (ProjectFileEventInfo e in args)
+            {
 				if (!IsCompileable (e.ProjectFile.Name) &&
-					e.ProjectFile.BuildAction == BuildAction.Compile) {
+					e.ProjectFile.BuildAction == BuildAction.Compile)
+                {
 					e.ProjectFile.BuildAction = BuildAction.None;
 				}
-				
+
 				if (e.ProjectFile.BuildAction == BuildAction.Compile)
-					ProjectInformationManager.Instance.Get (this).AddFile (e.ProjectFile.FilePath);
+                {
+                    // MG: remove utf-8 BOM from newly added files
+                    // (vala-0.24 cannot compile source files with BOM)
+                    FileUtils.RemoveBOM(e.ProjectFile.FilePath);
+
+                    ProjectInformationManager.Instance.Get (this).AddFile (e.ProjectFile.FilePath);
+                }
 			}
 		}
-		
+
 		protected override void OnFileChangedInProject (ProjectFileEventArgs args)
 		{
 			base.OnFileChangedInProject (args);

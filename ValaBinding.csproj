@@ -202,6 +202,7 @@
     <Compile Include="Compiler\ICompiler.cs" />
     <Compile Include="Gui\AddPathDialog.cs" />
     <Compile Include="Project\ProjectPackageCollection.cs" />
+    <Compile Include="Utils\FileUtils.cs" />
     <Compile Include="ValaLanguageBinding.cs" />
     <Compile Include="Project\ProjectPackage.cs" />
     <Compile Include="Project\ProjectPackageEventArgs.cs" />
