@@ -31,6 +31,8 @@
 
 using System;
 using MonoDevelop.Ide.Gui.Dialogs;
+using MonoDevelop.Core;
+using MonoDevelop.ValaBinding.Utils;
 
 namespace MonoDevelop.ValaBinding
 {
@@ -71,9 +73,14 @@ namespace MonoDevelop.ValaBinding
 			
 			if (outputNameTextEntry != null && outputNameTextEntry.Text.Length > 0)
 				configuration.Output = outputNameTextEntry.Text.Trim ();
-			
-			if (outputPathTextEntry.Text != null && outputPathTextEntry.Text.Length > 0)
-				configuration.OutputDirectory = outputPathTextEntry.Text.Trim ();
+
+            if (outputPathTextEntry.Text != null && outputPathTextEntry.Text.Length > 0)
+            {
+                var baseDirectory = FileUtils.GetExactPathName(configuration.SourceDirectory);
+                var path = FileUtils.GetExactPathName(outputPathTextEntry.Text.Trim());
+                configuration.OutputDirectory = FileService.AbsoluteToRelativePath(
+                    baseDirectory, path);
+            }
 			
 			if (parametersTextEntry.Text != null && parametersTextEntry.Text.Length > 0)
 				configuration.CommandLineParameters = parametersTextEntry.Text.Trim ();

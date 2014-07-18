@@ -50,5 +50,27 @@ namespace MonoDevelop.ValaBinding.Utils
                 dest.Write(content, srcOffset, content.Length - srcOffset);
             }
         }
+
+        /// <summary>
+        /// Converts path to correctly cased version of it.
+        /// </summary>
+        public static string GetExactPathName(string pathName)
+        {
+            if (!(File.Exists(pathName) || Directory.Exists(pathName)))
+                return pathName;
+
+            var di = new DirectoryInfo(pathName);
+
+            if (di.Parent != null)
+            {
+                return Path.Combine(
+                    GetExactPathName(di.Parent.FullName),
+                    di.Parent.GetFileSystemInfos(di.Name)[0].Name);
+            }
+            else
+            {
+                return di.Name.ToUpper();
+            }
+        }
     }
 }

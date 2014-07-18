@@ -69,47 +69,6 @@ namespace MonoDevelop.ValaBinding
 		public string CompilerCommand {
 			get { return compilerCommand; }
 		}
-		
-		/// <summary>
-		/// Generates compiler args for depended packages
-		/// </summary>
-		/// <param name="packages">
-		/// The collection of packages for this project 
-		/// <see cref="ProjectPackageCollection"/>
-		/// </param>
-		/// <returns>
-		/// The string needed by the compiler to reference the necessary packages
-		/// <see cref="System.String"/>
-		/// </returns>
-		public static string GeneratePkgCompilerArgs(ProjectPackageCollection packages,
-            ConfigurationSelector solutionConfiguration)
-		{
-			if (packages == null || packages.Count < 1)
-				return string.Empty;
-			
-			StringBuilder libs = new StringBuilder ();
-			
-			foreach (ProjectPackage p in packages)
-            {
-				if (p.IsProject)
-                {
-                    var proj = p.GetProject();
-                    var projectConfiguration = (ValaProjectConfiguration)proj.GetConfiguration(solutionConfiguration);
-                    var vapifile = Path.Combine(projectConfiguration.OutputDirectory,
-                        Path.ChangeExtension(projectConfiguration.Output, ".vapi"));
-                    libs.AppendFormat(" --Xcc=-I\"{0}\" --Xcc=-L\"{0}\" --Xcc=-l\"{1}\" \"{2}\" ",
-                        Path.GetDirectoryName(vapifile),
-                        Path.GetFileNameWithoutExtension(vapifile),
-                        vapifile);
-				}
-                else
-                {
-					libs.AppendFormat (" --pkg \"{0}\" ", p.Name);
-				}
-			}
-
-			return libs.ToString();
-		}
 
 		/// <summary>
 		/// Compile the project
@@ -161,9 +120,9 @@ namespace MonoDevelop.ValaBinding
 			return new BuildResult(cr, "");
 		}
 		
-		string ICompiler.GetCompilerFlags (ValaProjectConfiguration configuration)
+		string ICompiler.GetCompilerFlags(ValaProjectConfiguration configuration)
 		{
-			return ValaCompiler.GetCompilerFlags (configuration);
+			return ValaCompiler.GetCompilerFlags(configuration);
 		}
 		
 		/// <summary>
@@ -177,76 +136,130 @@ namespace MonoDevelop.ValaBinding
 		/// A compiler-interpretable string
 		/// <see cref="System.String"/>
 		/// </returns>
-		public static string GetCompilerFlags (ValaProjectConfiguration configuration)
-		{
-			List<string> args = new List<string> ();
-			
-			
-			ValaCompilationParameters cp =
-				(ValaCompilationParameters)configuration.CompilationParameters;
+        public static string GetCompilerFlags(ValaProjectConfiguration configuration)
+        {
+            List<string> args = new List<string>();
 
-			args.Add (string.Format ("-d \"{0}\"", configuration.OutputDirectory));
-			
-			if (configuration.DebugMode)
-				args.Add ("-g");
+            ValaCompilationParameters cp =
+                (ValaCompilationParameters)configuration.CompilationParameters;
 
-			switch (configuration.CompileTarget) {
-			case ValaBinding.CompileTarget.Bin:
-				if (cp.EnableMultithreading) {
-					args.Add ("--thread");
-				}
-				break;
-			case ValaBinding.CompileTarget.SharedLibrary:
-                if (Platform.IsWindows)
+            var outputDir = FileService.RelativeToAbsolutePath(configuration.SourceDirectory,
+                        configuration.OutputDirectory);
+            var outputNameWithoutExt = Path.GetFileNameWithoutExtension(configuration.Output);
+
+            args.Add(string.Format("-d \"{0}\"", outputDir));
+
+            if (configuration.DebugMode)
+                args.Add("-g");
+
+            switch (configuration.CompileTarget)
+            {
+                case ValaBinding.CompileTarget.Bin:
+                    if (cp.EnableMultithreading)
+                    {
+                        args.Add("--thread");
+                    }
+                    break;
+                case ValaBinding.CompileTarget.SharedLibrary:
+                    if (Platform.IsWindows)
+                    {
+                        args.Add(string.Format("--Xcc=\"-shared\" --Xcc=-I\"{0}\" -H \"{1}.h\" --library \"{1}\"", outputDir, outputNameWithoutExt));
+                    }
+                    else
+                    {
+                        args.Add(string.Format("--Xcc=\"-shared\" --Xcc=\"-fPIC\" --Xcc=\"-I'{0}'\" -H \"{1}.h\" --library \"{1}\"", outputDir, outputNameWithoutExt));
+                    }
+                    break;
+            }
+
+            // Valac will get these sooner or later			
+            //			switch (cp.WarningLevel)
+            //			{
+            //			case WarningLevel.None:
+            //				args.Append ("-w ");
+            //				break;
+            //			case WarningLevel.Normal:
+            //				// nothing
+            //				break;
+            //			case WarningLevel.All:
+            //				args.Append ("-Wall ");
+            //				break;
+            //			}
+            //			
+            //			if (cp.WarningsAsErrors)
+            //				args.Append ("-Werror ");
+            //			
+            if (0 < cp.OptimizationLevel)
+            {
+                args.Add("--Xcc=\"-O" + cp.OptimizationLevel + "\"");
+            }
+
+            if (cp.ExtraCompilerArguments != null && cp.ExtraCompilerArguments.Length > 0)
+            {
+                args.Add(cp.ExtraCompilerArguments.Replace(Environment.NewLine, " "));
+            }
+
+            if (cp.DefineSymbols != null && cp.DefineSymbols.Length > 0)
+            {
+                args.Add(ProcessDefineSymbols(cp.DefineSymbols));
+            }
+
+            if (configuration.Includes != null)
+            {
+                foreach (string inc in configuration.Includes)
                 {
-                    args.Add(string.Format("--Xcc=\"-shared\" --Xcc=-I\"{0}\" -H \"{1}.h\" --library \"{1}\"", configuration.OutputDirectory, configuration.Output));
+                    var includeDir = FileService.RelativeToAbsolutePath(configuration.SourceDirectory, inc);
+                    args.Add("--vapidir \"" + includeDir + "\"");
+                }
+            }
+
+            if (configuration.Libs != null)
+                foreach (string lib in configuration.Libs)
+                    args.Add("--pkg \"" + lib + "\"");
+
+            return string.Join(" ", args.ToArray());
+        }
+
+        /// <summary>
+        /// Generates compiler args for depended packages
+        /// </summary>
+        /// <param name="packages">
+        /// The collection of packages for this project 
+        /// <see cref="ProjectPackageCollection"/>
+        /// </param>
+        /// <returns>
+        /// The string needed by the compiler to reference the necessary packages
+        /// <see cref="System.String"/>
+        /// </returns>
+        public static string GeneratePkgCompilerArgs(ProjectPackageCollection packages,
+            ConfigurationSelector solutionConfiguration)
+        {
+            if (packages == null || packages.Count < 1)
+                return string.Empty;
+
+            StringBuilder libs = new StringBuilder();
+
+            foreach (ProjectPackage p in packages)
+            {
+                if (p.IsProject)
+                {
+                    var proj = p.GetProject();
+                    var projectConfiguration = (ValaProjectConfiguration)proj.GetConfiguration(solutionConfiguration);
+                    var outputDir = FileService.RelativeToAbsolutePath(projectConfiguration.SourceDirectory,
+                        projectConfiguration.OutputDirectory);
+                    var outputNameWithoutExt = Path.GetFileNameWithoutExtension(projectConfiguration.Output);
+                    var vapifile = Path.Combine(outputDir, outputNameWithoutExt + ".vapi");
+                    libs.AppendFormat(" --Xcc=-I\"{0}\" --Xcc=-L\"{0}\" --Xcc=-l\"{1}\" \"{2}\" ",
+                        outputDir, outputNameWithoutExt, vapifile);
                 }
                 else
                 {
-                    args.Add(string.Format("--Xcc=\"-shared\" --Xcc=\"-fPIC\" --Xcc=\"-I'{0}'\" -H \"{1}.h\" --library \"{1}\"", configuration.OutputDirectory, configuration.Output));
+                    libs.AppendFormat(" --pkg \"{0}\" ", p.Name);
                 }
-				break;
-			}
+            }
 
-// Valac will get these sooner or later			
-//			switch (cp.WarningLevel)
-//			{
-//			case WarningLevel.None:
-//				args.Append ("-w ");
-//				break;
-//			case WarningLevel.Normal:
-//				// nothing
-//				break;
-//			case WarningLevel.All:
-//				args.Append ("-Wall ");
-//				break;
-//			}
-//			
-//			if (cp.WarningsAsErrors)
-//				args.Append ("-Werror ");
-//			
-			if (0 < cp.OptimizationLevel) { 
-				args.Add ("--Xcc=\"-O" + cp.OptimizationLevel + "\"");
-			}
-			
-			if (cp.ExtraCompilerArguments != null && cp.ExtraCompilerArguments.Length > 0) {
-				args.Add(cp.ExtraCompilerArguments.Replace(Environment.NewLine, " "));
-			}
-			
-			if (cp.DefineSymbols != null && cp.DefineSymbols.Length > 0) {
-				args.Add (ProcessDefineSymbols (cp.DefineSymbols));
-			}
-			
-			if (configuration.Includes != null)
-				foreach (string inc in configuration.Includes)
-					args.Add ("--vapidir \"" + inc + "\"");
-
-			if (configuration.Libs != null)
-				foreach (string lib in configuration.Libs)
-					args.Add ("--pkg \"" + lib + "\"");
-			
-			return string.Join (" ", args.ToArray ());
-		}
+            return libs.ToString();
+        }
 		
 		/// <summary>
 		/// Generates compilers flags for selected defines
