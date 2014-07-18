@@ -102,8 +102,6 @@ namespace MonoDevelop.ValaBinding
 			if(!Directory.Exists(vapidir)){ vapidir = "/usr/share/vala/vapi"; }
 		}
 		
-
-		
 		public ValaProject ()
 		{
 			Init ();
@@ -173,7 +171,7 @@ namespace MonoDevelop.ValaBinding
 				}
 			}
 		}
-		
+
 		public override string[] SupportedLanguages {
 			get { return new string[] { "Vala" }; }
 		}
@@ -267,15 +265,9 @@ namespace MonoDevelop.ValaBinding
 			return pkgfile;
 		}
 		
-		protected override BuildResult DoBuild (IProgressMonitor monitor, ConfigurationSelector configuration)
+		protected override BuildResult DoBuild (IProgressMonitor monitor, ConfigurationSelector solutionConfiguration)
 		{
-			ValaProjectConfiguration pc = (ValaProjectConfiguration)GetConfiguration(configuration);
-			pc.SourceDirectory = BaseDirectory;
-			
-			return compiler_manager.Compile (
-				Files, packages,
-				pc,
-				monitor);
+			return compiler_manager.Compile(this, solutionConfiguration, monitor);
 		}
 		
 		ExecutionCommand CreateExecutionCommand (ValaProjectConfiguration conf)

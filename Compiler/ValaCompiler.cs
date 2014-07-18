@@ -81,7 +81,8 @@ namespace MonoDevelop.ValaBinding
 		/// The string needed by the compiler to reference the necessary packages
 		/// <see cref="System.String"/>
 		/// </returns>
-		public static string GeneratePkgCompilerArgs(ProjectPackageCollection packages)
+		public static string GeneratePkgCompilerArgs(ProjectPackageCollection packages,
+            ConfigurationSelector solutionConfiguration)
 		{
 			if (packages == null || packages.Count < 1)
 				return string.Empty;
@@ -93,87 +94,71 @@ namespace MonoDevelop.ValaBinding
 				if (p.IsProject)
                 {
                     var proj = p.GetProject();
-
-                    // TODO: get configuration from solution's configuration mapping!
-                    var config = (ValaProjectConfiguration)proj.DefaultConfiguration;
-                    var vapifile = Path.Combine(config.OutputDirectory,
-                        Path.ChangeExtension(config.Output, ".vapi"));
+                    var projectConfiguration = (ValaProjectConfiguration)proj.GetConfiguration(solutionConfiguration);
+                    var vapifile = Path.Combine(projectConfiguration.OutputDirectory,
+                        Path.ChangeExtension(projectConfiguration.Output, ".vapi"));
                     libs.AppendFormat(" --Xcc=-I\"{0}\" --Xcc=-L\"{0}\" --Xcc=-l\"{1}\" \"{2}\" ",
-                        Path.GetDirectoryName(vapifile), p.Name, vapifile);
+                        Path.GetDirectoryName(vapifile),
+                        Path.GetFileNameWithoutExtension(vapifile),
+                        vapifile);
 				}
                 else
                 {
 					libs.AppendFormat (" --pkg \"{0}\" ", p.Name);
 				}
 			}
-			
+
 			return libs.ToString();
 		}
 
 		/// <summary>
 		/// Compile the project
 		/// </summary>
-		/// <param name="projectFiles">
-		/// Collection of project files
-		/// <see cref="ProjectFileCollection"/>
-		/// </param>
-		/// <param name="packages">
-		/// Collection of depended packages
-		/// <see cref="ProjectPackageCollection"/>
-		/// </param>
-		/// <param name="configuration">
-		/// Project configuration
-		/// <see cref="ValaProjectConfiguration"/>
-		/// </param>
-		/// <param name="monitor">
-		/// Progress monitor to be used
-		/// <see cref="IProgressMonitor"/>
-		/// </param>
-		/// <returns>
-		/// Result of the compilation
-		/// <see cref="ICompilerResult"/>
-		/// </returns>
-		public BuildResult Compile (
-			ProjectFileCollection projectFiles,
-			ProjectPackageCollection packages,
-			ValaProjectConfiguration configuration,
+		public BuildResult Compile(ValaProject project,
+			ConfigurationSelector solutionConfiguration,
 			IProgressMonitor monitor)
 		{
-			
-			if (!appsChecked) {
+            var projectFiles = project.Files;
+            var packages = project.Packages;
+            var projectConfiguration = (ValaProjectConfiguration)project.GetConfiguration(solutionConfiguration);
+
+			if (!appsChecked)
+            {
+                // Check for compiler
 				appsChecked = true;
-				compilerFound = CheckApp (compilerCommand);
-			}/// Check for compiler
-				
-			
-			if (!compilerFound) {
+				compilerFound = CheckApp(compilerCommand);
+			}
+
+			if (!compilerFound)
+            {
+                // No compiler!
 				BuildResult cres = new BuildResult ();
-				cres.AddError ("Compiler not found: " + compilerCommand);
+				cres.AddError("Compiler not found: " + compilerCommand);
 				return cres;
-			}/// No compiler!
-			
-			CompilerResults cr = new CompilerResults (new TempFileCollection ());
-			bool success = true;
-			
-			/// Build compiler params string
-			string compilerArgs = GetCompilerFlags(configuration) + " " +
-                GeneratePkgCompilerArgs(packages);
-			
-			/// Build executable name
-			string outputName = Path.Combine (configuration.OutputDirectory,
-											  configuration.CompiledOutputName);
-			
-			monitor.BeginTask (GettextCatalog.GetString ("Compiling source"), 1);
-			
-			success = DoCompilation (projectFiles, compilerArgs, outputName, monitor, cr);
+			}
 
-			GenerateDepfile (configuration, packages);
-
-			if (success)
-				monitor.Step (1);
-			monitor.EndTask ();
+			// Build compiler params string
+			string compilerArgs = GetCompilerFlags(projectConfiguration) + " " +
+                GeneratePkgCompilerArgs(packages, solutionConfiguration);
 			
-			return new BuildResult (cr, "");
+			// Build executable name
+			string outputName = Path.Combine(projectConfiguration.OutputDirectory,
+                projectConfiguration.CompiledOutputName);
+			
+			monitor.BeginTask(GettextCatalog.GetString ("Compiling source"), 1);
+
+            CompilerResults cr = new CompilerResults(new TempFileCollection());
+            bool success = DoCompilation(projectFiles, compilerArgs, outputName, monitor, cr);
+
+			GenerateDepfile(projectConfiguration, packages);
+
+            if (success)
+            {
+                monitor.Step(1);
+            }
+			monitor.EndTask();
+
+			return new BuildResult(cr, "");
 		}
 		
 		string ICompiler.GetCompilerFlags (ValaProjectConfiguration configuration)
