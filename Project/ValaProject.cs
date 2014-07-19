@@ -587,12 +587,19 @@ namespace MonoDevelop.ValaBinding
             {
                 if (p.IsProject)
                 {
-                    var proj = p.GetProject();
-                    var projectConfiguration = (ValaProjectConfiguration)proj.GetConfiguration(solutionConfiguration);
-                    var outputDir = FileService.RelativeToAbsolutePath(projectConfiguration.SourceDirectory,
-                        projectConfiguration.OutputDirectory);
+                    var proj = p.GetProject() as ValaProject;
 
-                    list.Add(Path.Combine(outputDir, projectConfiguration.CompiledOutputName));
+                    if (proj != null)
+                    {
+                        // scan recursively
+                        proj.GetOutputFilesFromPackages(solutionConfiguration);
+
+                        var projectConfiguration = (ValaProjectConfiguration)proj.GetConfiguration(solutionConfiguration);
+                        var outputDir = FileService.RelativeToAbsolutePath(projectConfiguration.SourceDirectory,
+                            projectConfiguration.OutputDirectory);
+
+                        list.Add(Path.Combine(outputDir, projectConfiguration.CompiledOutputName));
+                    }
                 }
             }
 
