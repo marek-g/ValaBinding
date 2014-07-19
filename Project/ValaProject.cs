@@ -265,8 +265,14 @@ namespace MonoDevelop.ValaBinding
 			return pkgfile;
 		}
 		
-		protected override BuildResult DoBuild (IProgressMonitor monitor, ConfigurationSelector solutionConfiguration)
+		protected override BuildResult DoBuild(IProgressMonitor monitor, ConfigurationSelector solutionConfiguration)
 		{
+            var projectConfiguration = (ValaProjectConfiguration)GetConfiguration(solutionConfiguration);
+            if (projectConfiguration.CompileTarget == CompileTarget.Bin)
+            {
+                CopyOutputFilesFromPackages(monitor, solutionConfiguration);
+            }
+
 			return compiler_manager.Compile(this, solutionConfiguration, monitor);
 		}
 		
@@ -523,6 +529,74 @@ namespace MonoDevelop.ValaBinding
         public override IEnumerable<string> GetProjectTypes()
         {
             return new string[] { "Vala" };
+        }
+
+        /// <summary>
+        /// Copy packages dll files to output directory.
+        /// </summary>
+        /// <param name="monitor"></param>
+        /// <param name="solutionConfiguration"></param>
+        private void CopyOutputFilesFromPackages(IProgressMonitor monitor, ConfigurationSelector solutionConfiguration)
+        {
+            ProjectConfiguration config = (ProjectConfiguration)GetConfiguration(solutionConfiguration);
+
+            foreach (FileCopySet.Item item in GetOutputFilesFromPackages(solutionConfiguration))
+            {
+                FilePath dest = Path.GetFullPath(Path.Combine(config.OutputDirectory, item.Target));
+                FilePath src = Path.GetFullPath(item.Src);
+
+                try
+                {
+                    if (dest == src)
+                        continue;
+
+                    if (item.CopyOnlyIfNewer && File.Exists(dest) && (File.GetLastWriteTimeUtc(dest) >= File.GetLastWriteTimeUtc(src)))
+                        continue;
+
+                    // Use Directory.Create so we don't trigger the VersionControl addin and try to
+                    // add the directory to version control.
+                    if (!Directory.Exists(Path.GetDirectoryName(dest)))
+                        Directory.CreateDirectory(Path.GetDirectoryName(dest));
+
+                    if (File.Exists(src))
+                    {
+                        dest.Delete();
+                        FileService.CopyFile(src, dest);
+
+                        // Copied files can't be read-only, so they can be removed when rebuilding the project
+                        FileAttributes atts = File.GetAttributes(dest);
+                        if (atts.HasFlag(FileAttributes.ReadOnly))
+                            File.SetAttributes(dest, atts & ~FileAttributes.ReadOnly);
+                    }
+                    else
+                        monitor.ReportError(GettextCatalog.GetString("Could not find support file '{0}'.", src), null);
+
+                }
+                catch (IOException ex)
+                {
+                    monitor.ReportError(GettextCatalog.GetString("Error copying support file '{0}'.", dest), ex);
+                }
+            }
+        }
+
+        private FileCopySet GetOutputFilesFromPackages(ConfigurationSelector solutionConfiguration)
+        {
+            var list = new FileCopySet();
+
+            foreach (ProjectPackage p in Packages)
+            {
+                if (p.IsProject)
+                {
+                    var proj = p.GetProject();
+                    var projectConfiguration = (ValaProjectConfiguration)proj.GetConfiguration(solutionConfiguration);
+                    var outputDir = FileService.RelativeToAbsolutePath(projectConfiguration.SourceDirectory,
+                        projectConfiguration.OutputDirectory);
+
+                    list.Add(Path.Combine(outputDir, projectConfiguration.CompiledOutputName));
+                }
+            }
+
+            return list;
         }
     }
 }
