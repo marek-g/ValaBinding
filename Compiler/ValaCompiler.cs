@@ -399,7 +399,14 @@ namespace MonoDevelop.ValaBinding
 			string errorOutput = string.Empty;
 			int exitCode = ExecuteCommand (compilerCommand, compiler_args, Path.GetDirectoryName (outputName), monitor, out errorOutput);
 			
-			ParseCompilerOutput (errorOutput, cr, projectFiles);
+			ParseCompilerOutput(errorOutput, cr, projectFiles);
+
+            if (exitCode != 0 && cr.Errors.Count == 0)
+            {
+                // error isn't recognized but cannot ignore it because exitCode != 0
+                cr.Errors.Add(new CompilerError() { ErrorText = errorOutput });
+            }
+
 			return exitCode == 0;
 		}
 		
@@ -468,22 +475,24 @@ namespace MonoDevelop.ValaBinding
 		/// The CompilerResults into which to parse errorString
 		/// <see cref="CompilerResults"/>
 		/// </param>
-		protected void ParseCompilerOutput (string errorString, CompilerResults cr, ProjectFileCollection projectFiles)
-		{
-			TextReader reader = new StringReader (errorString);
-			string next;
-				
-			while ((next = reader.ReadLine ()) != null) {
-				CompilerError error = CreateErrorFromErrorString (next, projectFiles);
-				// System.Console.WriteLine ("Creating error from string \"{0}\"", next);
-				if (error != null) {
-					cr.Errors.Insert (0, error);
-					// System.Console.WriteLine ("Adding error");
-				}
-			}
-			
-			reader.Close ();
-		}
+        protected void ParseCompilerOutput(string errorString, CompilerResults cr, ProjectFileCollection projectFiles)
+        {
+            TextReader reader = new StringReader(errorString);
+            string next;
+
+            while ((next = reader.ReadLine()) != null)
+            {
+                CompilerError error = CreateErrorFromErrorString(next, projectFiles);
+                // System.Console.WriteLine ("Creating error from string \"{0}\"", next);
+                if (error != null)
+                {
+                    cr.Errors.Insert(0, error);
+                    // System.Console.WriteLine ("Adding error");
+                }
+            }
+
+            reader.Close();
+        }
 		
 		/// Error regex for valac
 		/// Sample output: "/home/user/project/src/blah.vala:23.5-23.5: error: syntax error, unexpected }, expecting ;"
@@ -492,7 +501,7 @@ namespace MonoDevelop.ValaBinding
 			RegexOptions.Compiled | RegexOptions.ExplicitCapture);
 
 		private static Regex gccRegex = new Regex (
-		    @"^\s*(?<file>.*):(?<line>\d*):((?<column>\d*):)?\s*(?<level>.*)\s*:\s(?<message>.*)",
+		    @"^\s*(?<file>.*\.c):(?<line>\d*):((?<column>\d*):)?\s*(?<level>.*)\s*:\s(?<message>.*)",
 			RegexOptions.Compiled | RegexOptions.ExplicitCapture);
 
 		/// Error regex for gnu linker - this could still be pertinent for vala
@@ -518,15 +527,12 @@ namespace MonoDevelop.ValaBinding
 				if ((errorMatch = regex.Match (errorString)).Success)
 					break;
 
-            CompilerError error = new CompilerError();
-			
-			if (!errorMatch.Success)
+            if (!errorMatch.Success)
             {
-                // MG: error line doesn't match but do not ignore it
-                error.ErrorText = errorString;
-                return error;
+                return null;
             }
-			
+
+            CompilerError error = new CompilerError();
 			foreach (ProjectFile pf in projectFiles) {
 				if (Path.GetFileName (pf.Name) == errorMatch.Groups["file"].Value) {
 					error.FileName = pf.FilePath;
