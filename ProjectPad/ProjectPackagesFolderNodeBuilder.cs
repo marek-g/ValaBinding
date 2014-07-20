@@ -198,8 +198,6 @@ namespace MonoDevelop.ValaBinding.ProjectPad
                 ValaProject draggedProject = (ValaProject)dataObject;
                 ValaProject destProject = (CurrentNode.DataItem as ProjectPackageCollection).Project;
 
-                draggedProject.WriteMDPkgPackage(IdeApp.Workspace.ActiveConfiguration);
-
                 ProjectPackage package = ProjectPackage.CreateBetween2Projects(destProject, draggedProject);
 
                 if (!destProject.Packages.Contains(package))

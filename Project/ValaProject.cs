@@ -220,11 +220,16 @@ namespace MonoDevelop.ValaBinding
         /// <summary>
         /// Ths pkg-config package is for internal MonoDevelop use only, it is not deployed.
         /// </summary>
-        public void WriteMDPkgPackage(ConfigurationSelector configuration)
+        public void WritePkgConfig(ConfigurationSelector configuration)
         {
-            string pkgfile = Path.Combine(BaseDirectory, Name + ".md.pc");
-
             ValaProjectConfiguration config = (ValaProjectConfiguration)GetConfiguration(configuration);
+
+            if (!Directory.Exists(config.OutputDirectory))
+            {
+                Directory.CreateDirectory(config.OutputDirectory);
+            }
+
+            string pkgfile = Path.Combine(config.OutputDirectory, Name + ".pc");
 
             using (StreamWriter writer = new StreamWriter(pkgfile))
             {
