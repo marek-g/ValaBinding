@@ -42,6 +42,7 @@ using MonoDevelop.Core.Serialization;
 using MonoDevelop.Ide;
 using MonoDevelop.ValaBinding.Utils;
 using MonoDevelop.Core;
+using System.Diagnostics;
 
 namespace MonoDevelop.ValaBinding
 {
@@ -56,31 +57,57 @@ namespace MonoDevelop.ValaBinding
         [ItemProperty("IsProject")]
         private bool is_project;
 
+        private bool isParsed;
+
         public string Description
         {
-            get { return description; }
-            set { description = value; }
+            get
+            {
+                if (!isParsed) Parse();
+                return description;
+            }
         }
         private string description;
 
         public string Version
         {
-            get { return version; }
-            set { version = value; }
+            get
+            {
+                if (!isParsed) Parse();
+                return version;
+            }
         }
         private string version;
 
         public List<string> Requires
         {
-            get { return requires; }
+            get
+            {
+                if (!isParsed) Parse();
+                return requires;
+            }
         }
         private List<string> requires;
 
+        public IList<string> CopyToOutput
+        {
+            get
+            {
+                if (!isParsed) Parse();
+                return copyToOutput;
+            }
+        }
+        private IList<string> copyToOutput;
+
+        public static string[] PackagePaths
+        {
+            get { return packagePaths; }
+        }
         private static string[] packagePaths;
 
         static ProjectPackage()
         {
-            packagePaths = ScanPackageDirs();
+            packagePaths = ScanPackagePaths();
         }
 
         protected ProjectPackage()
@@ -96,12 +123,6 @@ namespace MonoDevelop.ValaBinding
             this.file = file;
             this.name = name;
             this.is_project = isProject;
-
-            if (!isProject)
-            {
-                ParsePackage();
-                ParseRequires();
-            }
         }
 
         public static ProjectPackage CreateBetween2Projects(ValaProject parent, ValaProject child)
@@ -182,6 +203,18 @@ namespace MonoDevelop.ValaBinding
         public static string ProcessDescription(string desc)
         {
             return Regex.Replace(desc, @"(.{1,80} )", "$&" + Environment.NewLine, RegexOptions.Compiled);
+        }
+
+        protected void Parse()
+        {
+            if (!is_project)
+            {
+                ParsePackage();
+                ParseRequires();
+                ParseCopyToOutput();
+            }
+
+            isParsed = true;
         }
 
         /// <summary>
@@ -271,6 +304,18 @@ namespace MonoDevelop.ValaBinding
             }
         }
 
+        protected void ParseCopyToOutput()
+        {
+            var srcFiles = PkgConfigGetVariable("copy_to_output", Path.GetFileNameWithoutExtension(file));
+            if (string.IsNullOrEmpty(srcFiles))
+            {
+                copyToOutput = null;
+                return;
+            }
+
+            copyToOutput = srcFiles.Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+        }
+
         /// <summary>
         /// Scans PKG_CONFIG_PATH and a few static directories 
         /// for potential pkg-config repositories
@@ -278,7 +323,7 @@ namespace MonoDevelop.ValaBinding
         /// <returns>
         /// A <see cref="System.String"/> array: The potential directories
         /// </returns>
-        public static string[] ScanPackageDirs()
+        private static string[] ScanPackagePaths()
         {
             List<string> dirs = new List<string>();
             string pkg_var = Environment.GetEnvironmentVariable("PKG_CONFIG_PATH");
@@ -299,60 +344,34 @@ namespace MonoDevelop.ValaBinding
             return dirs.ToArray();
         }
 
-        /// <summary>
-        /// Converts an absolute path to a relative one
-        /// </summary>
-        /// <param name="absolutePath">
-        /// A <see cref="System.String"/>: The absolute path
-        /// </param>
-        /// <param name="relativeTo">
-        /// A <see cref="System.String"/>: The path to which the output path shall be relative
-        /// </param>
-        /// <returns>
-        /// A <see cref="System.String"/>: The relative path from relativeTo to absolutePath
-        /// </returns>
-        public static string ToRelativePath(string absolutePath, string relativeTo)
+        private static string PkgConfigGetVariable(string variableName, string packageName)
         {
-            List<string> fileTokens = new List<string>(absolutePath.Split(Path.DirectorySeparatorChar)),
-                          anchorTokens = new List<string>(relativeTo.Split(Path.DirectorySeparatorChar));
-            StringBuilder builder = new StringBuilder();
-            int length = 0;
-
-            if (!Path.IsPathRooted(absolutePath)) { return absolutePath; }
-            if (absolutePath == relativeTo) { return Path.GetFileName(absolutePath); }
-
-            if (absolutePath.StartsWith(relativeTo) && Directory.Exists(relativeTo))
+            try
             {
-                builder.AppendFormat(".{0}", Path.DirectorySeparatorChar);
-            }// if absolutePath is inside relativeTo
-
-            for (; 0 != fileTokens.Count && 0 != anchorTokens.Count; )
-            {
-                if (fileTokens[0] == anchorTokens[0])
+                using (Process pkgconfig = new Process())
                 {
-                    fileTokens.RemoveAt(0);
-                    anchorTokens.RemoveAt(0);
+                    pkgconfig.StartInfo.FileName = "pkg-config";
+                    pkgconfig.StartInfo.Arguments = string.Format("--variable={0} {1}", variableName, packageName);
+                    pkgconfig.StartInfo.CreateNoWindow = true;
+                    pkgconfig.StartInfo.RedirectStandardOutput = true;
+                    pkgconfig.StartInfo.UseShellExecute = false;
+                    pkgconfig.Start();
+                    var result = pkgconfig.StandardOutput.ReadToEnd().Trim();
+                    pkgconfig.WaitForExit();
+                    
+                    if (pkgconfig.ExitCode == 0)
+                    {
+                        return result;
+                    }
+
+                    return "";
                 }
-                else { break; }
-            }// strip identical leading path
-
-            for (int i = 0; i < anchorTokens.Count - 1; ++i)
+            }
+            catch (Exception e)
             {
-                builder.AppendFormat("..{0}", Path.DirectorySeparatorChar);
-            }// navigate out of anchor subdir
-
-            foreach (string token in fileTokens)
-            {
-                builder.AppendFormat("{0}{1}", token, Path.DirectorySeparatorChar);
-            }// append filepath
-
-            length = builder.Length;
-            if (0 < builder.Length && Path.DirectorySeparatorChar == builder[builder.Length - 1])
-            {
-                --length;
-            }// check for trailing separator
-
-            return builder.ToString(0, length);
-        }// ToRelativePath
+                MessageService.ShowError("Unable to run pkg-config", string.Format("{0}{1}{2}", e.Message, Environment.NewLine, e.StackTrace));
+                return "";
+            }
+        }
     }
 }

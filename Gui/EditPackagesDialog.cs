@@ -161,7 +161,7 @@ namespace MonoDevelop.ValaBinding
             }
 
             // Fill up the normal tree view
-            foreach (string dir in ProjectPackage.ScanPackageDirs())
+            foreach (string dir in ProjectPackage.PackagePaths)
             {
                 if (Directory.Exists(dir))
                 {

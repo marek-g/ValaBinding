@@ -71,7 +71,6 @@ namespace MonoDevelop.ValaBinding
         private ICompiler compiler_manager;
 
         private ProjectPackageCollection packages = new ProjectPackageCollection();
-        public static string vapidir;
 
         public event ProjectPackageEventHandler PackageAddedToProject;
         public event ProjectPackageEventHandler PackageRemovedFromProject;
@@ -81,29 +80,6 @@ namespace MonoDevelop.ValaBinding
             packages.Project = this;
             this.PackageAddedToProject += AddDependencies; // Special handling for project packages
             //IdeApp.ProjectOperations.EntryAddedToCombine += OnEntryAddedToCombine;
-        }
-
-        static ValaProject()
-        {
-            try
-            {
-                Process pkgconfig = new Process();
-                pkgconfig.StartInfo.FileName = "pkg-config";
-                pkgconfig.StartInfo.Arguments = "--variable=vapidir vala-1.0";
-                pkgconfig.StartInfo.CreateNoWindow = true;
-                pkgconfig.StartInfo.RedirectStandardOutput = true;
-                pkgconfig.StartInfo.UseShellExecute = false;
-                pkgconfig.Start();
-                vapidir = pkgconfig.StandardOutput.ReadToEnd().Trim();
-                pkgconfig.WaitForExit();
-                pkgconfig.Dispose();
-            }
-            catch (Exception e)
-            {
-                MessageService.ShowError("Unable to detect VAPI path", string.Format("{0}{1}{2}", e.Message, Environment.NewLine, e.StackTrace));
-            }
-
-            if (!Directory.Exists(vapidir)) { vapidir = "/usr/share/vala/vapi"; }
         }
 
         public ValaProject()
@@ -652,6 +628,16 @@ namespace MonoDevelop.ValaBinding
                             projectConfiguration.OutputDirectory);
 
                         list.Add(Path.Combine(outputDir, projectConfiguration.CompiledOutputName));
+                    }
+                }
+                else
+                {
+                    if (p.CopyToOutput != null)
+                    {
+                        foreach (var sourceFile in p.CopyToOutput)
+                        {
+                            list.Add(sourceFile);
+                        }
                     }
                 }
             }
