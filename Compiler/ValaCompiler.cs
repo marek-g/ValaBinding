@@ -509,7 +509,7 @@ namespace MonoDevelop.ValaBinding
 			RegexOptions.Compiled | RegexOptions.ExplicitCapture);
 
 		private static Regex gccRegex = new Regex (
-		    @"^\s*(?<file>.*\.c):(?<line>\d*):((?<column>\d*):)?\s*(?<level>.*)\s*:\s(?<message>.*)",
+		    @"^\s*(?<file>.*\.c):(?<line>\d*):((?<column>\d*):)?\s*(?<level>[^:]*):\s(?<message>.*)",
 			RegexOptions.Compiled | RegexOptions.ExplicitCapture);
 
 		/// Error regex for gnu linker - this could still be pertinent for vala
@@ -553,7 +553,8 @@ namespace MonoDevelop.ValaBinding
 			error.Line = int.Parse (errorMatch.Groups["line"].Value);
 			if (errorMatch.Groups["column"].Success)
 				error.Column = int.Parse (errorMatch.Groups["column"].Value);
-			error.IsWarning = !errorMatch.Groups["level"].Value.Equals (GettextCatalog.GetString ("error"), StringComparison.Ordinal);
+			error.IsWarning = !errorMatch.Groups["level"].Value.Equals(GettextCatalog.GetString ("error"), StringComparison.Ordinal) &&
+                !errorMatch.Groups["level"].Value.StartsWith("fatal error");
 			error.ErrorText = errorMatch.Groups["message"].Value;
 			
 			return error;
