@@ -194,6 +194,14 @@ namespace MonoDevelop.ValaBinding
                 args.Add("--Xcc=\"-O" + cp.OptimizationLevel + "\"");
             }
 
+            // global extra compiler arguments
+            string globalExtraCompilerArgs = PropertyService.Get("ValaBinding.ExtraCompilerOptions", "");
+            if (!string.IsNullOrEmpty(globalExtraCompilerArgs))
+            {
+                args.Add(globalExtraCompilerArgs.Replace(Environment.NewLine, " "));
+            }
+
+            // extra compiler arguments specific to project
             if (cp.ExtraCompilerArguments != null && cp.ExtraCompilerArguments.Length > 0)
             {
                 args.Add(cp.ExtraCompilerArguments.Replace(Environment.NewLine, " "));
