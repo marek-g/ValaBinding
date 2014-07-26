@@ -119,8 +119,9 @@ namespace MonoDevelop.ValaBinding
 
             foreach (ValaProjectConfiguration c in Configurations)
             {
-                c.OutputDirectory = Path.Combine(binPath, c.Name);
                 c.SourceDirectory = info.ProjectBasePath;
+                c.OutputDirectory = Path.Combine(binPath, c.Name);
+                c.OutputDirectory = FileService.AbsoluteToRelativePath(c.SourceDirectory, c.OutputDirectory);
                 c.Output = Name;
                 ValaCompilationParameters parameters = c.CompilationParameters as ValaCompilationParameters;
 
@@ -200,19 +201,20 @@ namespace MonoDevelop.ValaBinding
         {
             ValaProjectConfiguration config = (ValaProjectConfiguration)GetConfiguration(configuration);
 
-            if (!Directory.Exists(config.OutputDirectory))
+            var outputDir = FileService.RelativeToAbsolutePath(config.SourceDirectory, config.OutputDirectory);
+            if (!Directory.Exists(outputDir))
             {
-                Directory.CreateDirectory(config.OutputDirectory);
+                Directory.CreateDirectory(outputDir);
             }
 
-            string pkgfile = Path.Combine(config.OutputDirectory, Name + ".pc");
+            string pkgfile = Path.Combine(outputDir, Name + ".pc");
 
             using (StreamWriter writer = new StreamWriter(pkgfile))
             {
                 writer.WriteLine("Name: {0}", Name);
                 writer.WriteLine("Description: {0}", Description);
                 writer.WriteLine("Version: {0}", Version);
-                writer.WriteLine("Libs: -L{0} -l{1}", config.OutputDirectory, config.Output);
+                writer.WriteLine("Libs: -L{0} -l{1}", outputDir, config.Output);
                 //				writer.WriteLine ("Cflags: -I{0}", BaseDirectory);
             }
 
@@ -223,11 +225,11 @@ namespace MonoDevelop.ValaBinding
 
             if (string.IsNullOrEmpty(ld_library_path))
             {
-                Environment.SetEnvironmentVariable(literal, config.OutputDirectory);
+                Environment.SetEnvironmentVariable(literal, outputDir);
             }
-            else if (!ld_library_path.Contains(config.OutputDirectory))
+            else if (!ld_library_path.Contains(outputDir))
             {
-                ld_library_path = string.Format("{0}:{1}", config.OutputDirectory, ld_library_path);
+                ld_library_path = string.Format("{0}:{1}", outputDir, ld_library_path);
                 Environment.SetEnvironmentVariable(literal, ld_library_path);
             }
         }
@@ -279,9 +281,10 @@ namespace MonoDevelop.ValaBinding
         ExecutionCommand CreateExecutionCommand(ValaProjectConfiguration conf)
         {
             NativeExecutionCommand cmd = new NativeExecutionCommand();
-            cmd.Command = Path.Combine(conf.OutputDirectory, conf.Output);
+            var outputDir = FileService.RelativeToAbsolutePath(conf.SourceDirectory, conf.OutputDirectory);
+            cmd.Command = Path.Combine(outputDir, conf.Output);
             cmd.Arguments = conf.CommandLineParameters;
-            cmd.WorkingDirectory = Path.GetFullPath(conf.OutputDirectory);
+            cmd.WorkingDirectory = outputDir;
             return cmd;
         }
 
@@ -347,7 +350,8 @@ namespace MonoDevelop.ValaBinding
         public override FilePath GetOutputFileName(ConfigurationSelector configuration)
         {
             ValaProjectConfiguration conf = (ValaProjectConfiguration)GetConfiguration(configuration);
-            return conf.OutputDirectory.Combine(conf.CompiledOutputName);
+            var outputDir = FileService.RelativeToAbsolutePath(conf.SourceDirectory, conf.OutputDirectory);
+            return Path.Combine(outputDir, conf.CompiledOutputName);
         }
 
         public override SolutionItemConfiguration CreateConfiguration(string name)
@@ -401,7 +405,8 @@ namespace MonoDevelop.ValaBinding
                 {
                     if (p.IsProject)
                     {
-                        string file = Path.GetFullPath(Path.Combine(configuration.OutputDirectory, p.File));
+                        var outputDir = FileService.RelativeToAbsolutePath(configuration.SourceDirectory, configuration.OutputDirectory);
+                        string file = Path.Combine(outputDir, p.File);
                         LoggingService.LogDebug("Adding {0} for project package {1}", file, p.Name);
                         pi.AddFile(file);
                     }
@@ -567,12 +572,13 @@ namespace MonoDevelop.ValaBinding
         /// <param name="solutionConfiguration"></param>
         private void CopyOutputFilesFromPackages(IProgressMonitor monitor, ConfigurationSelector solutionConfiguration)
         {
-            ProjectConfiguration config = (ProjectConfiguration)GetConfiguration(solutionConfiguration);
+            ValaProjectConfiguration config = (ValaProjectConfiguration)GetConfiguration(solutionConfiguration);
 
             foreach (FileCopySet.Item item in GetOutputFilesFromPackages(solutionConfiguration))
             {
-                FilePath dest = Path.GetFullPath(Path.Combine(config.OutputDirectory, item.Target));
-                FilePath src = Path.GetFullPath(item.Src);
+                var outputDir = FileService.RelativeToAbsolutePath(config.SourceDirectory, config.OutputDirectory);
+                FilePath dest = Path.Combine(outputDir, item.Target);
+                FilePath src = Path.Combine(config.SourceDirectory, item.Src);
 
                 try
                 {

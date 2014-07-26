@@ -101,7 +101,8 @@ namespace MonoDevelop.ValaBinding
                 GeneratePkgCompilerArgs(packages, solutionConfiguration);
 			
 			// Build executable name
-			string outputName = Path.Combine(projectConfiguration.OutputDirectory,
+			string outputName = Path.Combine(
+                FileService.RelativeToAbsolutePath(projectConfiguration.SourceDirectory, projectConfiguration.OutputDirectory),
                 projectConfiguration.CompiledOutputName);
 			
 			monitor.BeginTask(GettextCatalog.GetString ("Compiling source"), 1);
@@ -433,23 +434,31 @@ namespace MonoDevelop.ValaBinding
 		/// The progress monitor to be used
 		/// <see cref="IProgressMonitor"/>
 		/// </param>
-		public void Clean (ProjectFileCollection projectFiles, ValaProjectConfiguration configuration, IProgressMonitor monitor)
-		{
-			/// Clean up intermediate files
-			/// These should only be generated for libraries, but we'll check for them in all cases
-			foreach (ProjectFile file in projectFiles) {
-				if (file.BuildAction == BuildAction.Compile) {
-					string cFile = Path.Combine (configuration.OutputDirectory, Path.GetFileNameWithoutExtension (file.Name) + ".c");
-					if (File.Exists (cFile)){ File.Delete (cFile); }
-						
-					string hFile = Path.Combine (configuration.OutputDirectory, Path.GetFileNameWithoutExtension (file.Name) + ".h");
-					if (File.Exists (hFile)){ File.Delete (hFile); }
-				}
-			}
-			
-			string vapiFile = Path.Combine (configuration.OutputDirectory, configuration.Output + ".vapi");
-			if (File.Exists (vapiFile)){ File.Delete (vapiFile); }
-		}
+        public void Clean(ProjectFileCollection projectFiles, ValaProjectConfiguration configuration, IProgressMonitor monitor)
+        {
+            /// Clean up intermediate files
+            /// These should only be generated for libraries, but we'll check for them in all cases
+            foreach (ProjectFile file in projectFiles)
+            {
+                if (file.BuildAction == BuildAction.Compile)
+                {
+                    string cFile = Path.Combine(
+                        FileService.RelativeToAbsolutePath(configuration.SourceDirectory, configuration.OutputDirectory),
+                        Path.GetFileNameWithoutExtension(file.Name) + ".c");
+                    if (File.Exists(cFile)) { File.Delete(cFile); }
+
+                    string hFile = Path.Combine(
+                        FileService.RelativeToAbsolutePath(configuration.SourceDirectory, configuration.OutputDirectory),
+                        Path.GetFileNameWithoutExtension(file.Name) + ".h");
+                    if (File.Exists(hFile)) { File.Delete(hFile); }
+                }
+            }
+
+            string vapiFile = Path.Combine(
+                FileService.RelativeToAbsolutePath(configuration.SourceDirectory, configuration.OutputDirectory),
+                configuration.Output + ".vapi");
+            if (File.Exists(vapiFile)) { File.Delete(vapiFile); }
+        }
 		
 		/// <summary>
 		/// Determines whether the target needs to be updated
@@ -636,17 +645,23 @@ namespace MonoDevelop.ValaBinding
 			}
 		}
 
-		public void GenerateDepfile (ValaProjectConfiguration configuration, ProjectPackageCollection packages)
-		{
-			try {
-				if (configuration.CompileTarget != CompileTarget.SharedLibrary){ return; }
-				
-				using (StreamWriter writer = new StreamWriter (Path.Combine (configuration.OutputDirectory, Path.ChangeExtension (configuration.Output, ".deps")))) {
-					foreach (ProjectPackage package in packages) {
-						writer.WriteLine (package.Name);
-					}
-				}
-			} catch { /* Don't care */ }
-		}
+        public void GenerateDepfile(ValaProjectConfiguration configuration, ProjectPackageCollection packages)
+        {
+            try
+            {
+                if (configuration.CompileTarget != CompileTarget.SharedLibrary) { return; }
+
+                using (StreamWriter writer = new StreamWriter(Path.Combine(
+                    FileService.RelativeToAbsolutePath(configuration.SourceDirectory, configuration.OutputDirectory),
+                    Path.ChangeExtension(configuration.Output, ".deps"))))
+                {
+                    foreach (ProjectPackage package in packages)
+                    {
+                        writer.WriteLine(package.Name);
+                    }
+                }
+            }
+            catch { /* Don't care */ }
+        }
 	}
 }

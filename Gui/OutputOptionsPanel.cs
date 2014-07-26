@@ -33,6 +33,8 @@ using System;
 using MonoDevelop.Ide.Gui.Dialogs;
 using MonoDevelop.Core;
 using MonoDevelop.ValaBinding.Utils;
+using System.IO;
+using MonoDevelop.Ide;
 
 namespace MonoDevelop.ValaBinding
 {
@@ -52,7 +54,8 @@ namespace MonoDevelop.ValaBinding
 			configuration = config;
 			
 			outputNameTextEntry.Text = configuration.Output;
-			outputPathTextEntry.Text = configuration.OutputDirectory;
+            outputPathTextEntry.Text = FileService.AbsoluteToRelativePath(
+                    configuration.SourceDirectory, configuration.OutputDirectory);
 			parametersTextEntry.Text = configuration.CommandLineParameters;
 			
 			externalConsoleCheckbox.Active = configuration.ExternalConsole;
@@ -61,7 +64,8 @@ namespace MonoDevelop.ValaBinding
 		
 		private void OnBrowseButtonClick (object sender, EventArgs e)
 		{
-			AddPathDialog dialog = new AddPathDialog (configuration.OutputDirectory);
+			AddPathDialog dialog = new AddPathDialog(
+                FileService.RelativeToAbsolutePath(configuration.SourceDirectory, configuration.OutputDirectory));
 			dialog.Run ();
 			outputPathTextEntry.Text = dialog.SelectedPath;
 		}
@@ -77,7 +81,22 @@ namespace MonoDevelop.ValaBinding
             if (outputPathTextEntry.Text != null && outputPathTextEntry.Text.Length > 0)
             {
                 var baseDirectory = FileUtils.GetExactPathName(configuration.SourceDirectory);
-                var path = FileUtils.GetExactPathName(outputPathTextEntry.Text.Trim());
+                var fullPath = FileService.RelativeToAbsolutePath(configuration.SourceDirectory,
+                    outputPathTextEntry.Text.Trim());
+
+                if (!Directory.Exists(fullPath))
+                {
+                    try
+                    {
+                        Directory.CreateDirectory(fullPath);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageService.ShowException(ex, "Cannot create output folder.");
+                    }
+                }
+
+                var path = FileUtils.GetExactPathName(fullPath);
                 configuration.OutputDirectory = FileService.AbsoluteToRelativePath(
                     baseDirectory, path);
             }
