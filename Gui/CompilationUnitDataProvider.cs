@@ -40,60 +40,59 @@ using Gtk;
 
 namespace MonoDevelop.ValaBinding
 {
-	// Yoinked from C# binding
-	public class CompilationUnitDataProvider : DropDownBoxListWindow.IListDataProvider
-	{
-		Document Document { get; set; }
-		
-		public CompilationUnitDataProvider (Document document)
-		{
-			this.Document = document;
-		}// constructor
-		
-		#region IListDataProvider implementation
-		public void Reset () { }
-		
-		public string GetMarkup (int n)
-		{
-			return Document.ParsedDocument.UserRegions.ElementAt (n).Name;
-		}// GetText
+    // Yoinked from C# binding
+    public class CompilationUnitDataProvider : DropDownBoxListWindow.IListDataProvider
+    {
+        Document Document { get; set; }
+
+        public CompilationUnitDataProvider(Document document)
+        {
+            this.Document = document;
+        }// constructor
+
+        #region IListDataProvider implementation
+        public void Reset() { }
+
+        public string GetMarkup(int n)
+        {
+            return Document.ParsedDocument.UserRegions.ElementAt(n).Name;
+        }// GetText
 
         internal static Image Pixbuf
-		{
-			get { return ImageService.GetImage(Gtk.Stock.Add, IconSize.Menu); }
-		}// Pixbuf
+        {
+            get { return ImageService.GetImage(Gtk.Stock.Add, IconSize.Menu); }
+        }// Pixbuf
 
-        // TODO: update for Xamarin Studio 5
         public Xwt.Drawing.Image GetIcon(int n)
-		{
-            return null;
-			//return Pixbuf;
-		}// GetIcon
-		
-		public object GetTag (int n)
-		{
-			return Document.ParsedDocument.UserRegions.ElementAt (n);
-		}// GetTag
+        {
+            return ImageService.GetIcon(Gtk.Stock.Add, IconSize.Menu);
+        }// GetIcon
 
-        // TODO: update for Xamarin Studio 5
-		public void ActivateItem (int n)
+        public object GetTag(int n)
+        {
+            return Document.ParsedDocument.UserRegions.ElementAt(n);
+        }// GetTag
+
+        public void ActivateItem(int n)
 		{
 			var reg = Document.ParsedDocument.UserRegions.ElementAt (n);
 			MonoDevelop.Ide.Gui.Content.IExtensibleTextEditor extEditor = Document.GetContent<MonoDevelop.Ide.Gui.Content.IExtensibleTextEditor> ();
-			/*if (extEditor != null)
-				extEditor.SetCaretTo (Math.Max (1, reg.Region.Start.Line), reg.Region.Start.Column);*/
+			if (extEditor != null)
+            {
+				extEditor.SetCaretTo(Math.Max (1, reg.Region.BeginLine), reg.Region.BeginColumn);
+            }
 		}// ActivateItem
-		
-		public int IconCount
-		{
-			get {
-				if (Document.ParsedDocument == null)
-					return 0;
-				return Document.ParsedDocument.UserRegions.Count ();
-			}
-		}// IconCount
-		
-		#endregion
+
+        public int IconCount
+        {
+            get
+            {
+                if (Document.ParsedDocument == null)
+                    return 0;
+                return Document.ParsedDocument.UserRegions.Count();
+            }
+        }// IconCount
+
+        #endregion
     }// CompilationUnitDataProvider
 }
-

@@ -50,6 +50,8 @@ using Gtk;
 
 using MonoDevelop.ValaBinding.Parser;
 using Mono.TextEditor;
+using Xwt;
+using MonoDevelop.Ide.TypeSystem;
 
 namespace MonoDevelop.ValaBinding
 {
@@ -113,9 +115,7 @@ namespace MonoDevelop.ValaBinding
         /// </summary>
         private static Regex initializationRegex = new Regex(@"(((?<typename>\w[\w\d\.<>]*)\s+)?(?<variable>\w[\w\d]*)\s*=\s*)?new\s*(?<constructor>\w[\w\d\.<>]*)?", RegexOptions.Compiled);
 
-        // TODO: update for Xamarin Studio 5 (no suitable method found to override)
-        public /*override*/ ICompletionDataList HandleCodeCompletion(
-            CodeCompletionContext completionContext, char completionChar)
+        public override ICompletionDataList HandleCodeCompletion(CodeCompletionContext completionContext, char completionChar, ref int triggerWordLength)
         {
             string lineText = null;
             ProjectInformation parser = Parser;
@@ -227,8 +227,9 @@ namespace MonoDevelop.ValaBinding
             if (null == (Document.Project as ValaProject)) { return null; }
 
             int pos = completionContext.TriggerOffset;
+            int triggerWordLength = completionContext.TriggerWordLength;
 
-            ICompletionDataList list = HandleCodeCompletion(completionContext, Editor.GetTextBetween(pos - 1, pos)[0]);
+            ICompletionDataList list = HandleCodeCompletion(completionContext, Editor.GetCharAt(pos), ref triggerWordLength);
             if (null == list)
             {
                 list = GlobalComplete(completionContext);
@@ -269,64 +270,74 @@ namespace MonoDevelop.ValaBinding
             return list;
         }
 
-        // TODO: update for Xamarin Studio 5
-        /*public override  IParameterDataProvider HandleParameterCompletion (
+        public override MonoDevelop.Ide.CodeCompletion.ParameterDataProvider HandleParameterCompletion(
             CodeCompletionContext completionContext, char completionChar)
         {
             if (completionChar != '(')
                 return null;
-			
+
             ProjectInformation info = Parser;
-            if (null == info){ return null; }
-			
-            int position = Editor.Document.GetLine (Editor.Caret.Line).Offset;
-            string lineText = Editor.GetTextBetween (position, Editor.Caret.Offset - 1).TrimEnd ();
+            if (null == info) { return null; }
+
+            int position = Editor.Document.GetLine(Editor.Caret.Line).Offset;
+            string lineText = Editor.GetTextBetween(position, Editor.Caret.Offset - 1).TrimEnd();
             string functionName = string.Empty;
-			
-            Match match = initializationRegex.Match (lineText);
-            if (match.Success && match.Groups["constructor"].Success) {
+
+            Match match = initializationRegex.Match(lineText);
+            if (match.Success && match.Groups["constructor"].Success)
+            {
                 string[] tokens = match.Groups["constructor"].Value.Split('.');
-                string overload = tokens[tokens.Length-1];
-                string typename = (match.Groups["typename"].Success? match.Groups["typename"].Value: null);
+                string overload = tokens[tokens.Length - 1];
+                string typename = (match.Groups["typename"].Success ? match.Groups["typename"].Value : null);
                 int index = 0;
-				
-                if (1 == tokens.Length || null == typename) {
+
+                if (1 == tokens.Length || null == typename)
+                {
                     // Ideally if typename is null and token length is longer than 1, 
                     // we have an expression like: var w = new x.y.z(); and 
                     // we would check whether z is the type or if y.z is an overload for type y
                     typename = overload;
-                } else if ("var".Equals (typename, StringComparison.Ordinal)) {
+                }
+                else if ("var".Equals(typename, StringComparison.Ordinal))
+                {
                     typename = match.Groups["constructor"].Value;
-                } else {
+                }
+                else
+                {
                     // Foo.Bar bar = new Foo.Bar.blah( ...
-                    for (string[] typeTokens = typename.Split ('.'); index < typeTokens.Length && index < tokens.Length; ++index) {
-                        if (!typeTokens[index].Equals (tokens[index], StringComparison.Ordinal)) {
+                    for (string[] typeTokens = typename.Split('.'); index < typeTokens.Length && index < tokens.Length; ++index)
+                    {
+                        if (!typeTokens[index].Equals(tokens[index], StringComparison.Ordinal))
+                        {
                             break;
                         }
                     }
-                    List<string> overloadTokens = new List<string> ();
-                    for (int i=index; i<tokens.Length; ++i) {
-                        overloadTokens.Add (tokens[i]);
+                    List<string> overloadTokens = new List<string>();
+                    for (int i = index; i < tokens.Length; ++i)
+                    {
+                        overloadTokens.Add(tokens[i]);
                     }
-                    overload = string.Join (".", overloadTokens.ToArray ());
-                } 
-				
+                    overload = string.Join(".", overloadTokens.ToArray());
+                }
+
                 // HACK: Generics
-                if (0 < (index = overload.IndexOf ("<", StringComparison.Ordinal))) {
-                    overload = overload.Substring (0, index);
+                if (0 < (index = overload.IndexOf("<", StringComparison.Ordinal)))
+                {
+                    overload = overload.Substring(0, index);
                 }
-                if (0 < (index = typename.IndexOf ("<", StringComparison.Ordinal))) {
-                    typename = typename.Substring (0, index);
+                if (0 < (index = typename.IndexOf("<", StringComparison.Ordinal)))
+                {
+                    typename = typename.Substring(0, index);
                 }
-				
+
                 // Console.WriteLine ("Constructor: type {0}, overload {1}", typename, overload);
-                return new ParameterDataProvider (Document, info, typename, overload); 
-            } 
-			
-            int nameStart = lineText.LastIndexOfAny (allowedChars) + 1;
-            functionName = lineText.Substring (nameStart).Trim ();
-            return (string.IsNullOrEmpty (functionName)? null: new ParameterDataProvider (Document, info, functionName));
-        }*/
+                return new ParameterDataProvider(Document, info, typename, overload);
+            }
+
+            int nameStart = lineText.LastIndexOfAny(allowedChars) + 1;
+            functionName = lineText.Substring(nameStart).Trim();
+            return (string.IsNullOrEmpty(functionName) ? null : new ParameterDataProvider(Document, info, functionName));
+        }
 
         private bool AllWhiteSpace(string lineText)
         {
@@ -340,8 +351,7 @@ namespace MonoDevelop.ValaBinding
         #region IPathedDocument implementation
         public event EventHandler<DocumentPathChangedEventArgs> PathChanged;
 
-        // TODO: update for Xamarin Studio 5
-        public Widget CreatePathWidget(int index)
+        public Gtk.Widget CreatePathWidget(int index)
         {
             PathEntry[] path = CurrentPath;
             if (null == path || 0 > index || path.Length <= index)
@@ -351,11 +361,14 @@ namespace MonoDevelop.ValaBinding
 
             object tag = path[index].Tag;
             DropDownBoxListWindow.IListDataProvider provider = null;
-            //if (tag is ICompilationUnit) {
-            provider = new CompilationUnitDataProvider(Document);
-            //} else {
-            //provider = new DataProvider (Document, tag, GetAmbience ());
-            //}
+            if (tag is ParsedDocument)
+            {
+                provider = new CompilationUnitDataProvider(Document);
+            }
+            else
+            {
+                provider = new DataProvider(Document, tag, GetAmbience());
+            }
 
             DropDownBoxListWindow window = new DropDownBoxListWindow(provider);
             window.SelectItem(tag);
@@ -380,60 +393,75 @@ namespace MonoDevelop.ValaBinding
         // Yoinked from C# binding
         void UpdatePath(object sender, DocumentLocationEventArgs e)
         {
-            // TODO: update for Xamarin Studio 5
+            // TODO:
+
             /*var unit = Document.CompilationUnit;
             if (unit == null)
                 return;
-				
+
             var loc = textEditorData.Caret.Location;
-            IType type = unit.GetTypeAt (loc.Line, loc.Column);
-            List<PathEntry> result = new List<PathEntry> ();
-            Ambience amb = GetAmbience ();
+            IType type = unit.GetTypeAt(loc.Line, loc.Column);
+            List<PathEntry> result = new List<PathEntry>();
+            Ambience amb = GetAmbience();
             IMember member = null;
             INode node = (INode)unit;
-			
-            if (type != null && type.ClassType != ClassType.Delegate) {
-                member = type.GetMemberAt (loc.Line, loc.Column);
+
+            if (type != null && type.ClassType != ClassType.Delegate)
+            {
+                member = type.GetMemberAt(loc.Line, loc.Column);
             }
-			
-            if (null != member) {
+
+            if (null != member)
+            {
                 node = member;
-            } else if (null != type) {
+            }
+            else if (null != type)
+            {
                 node = type;
             }
-			
-            while (node != null) {
+
+            while (node != null)
+            {
                 PathEntry entry;
-                if (node is ICompilationUnit) {
-                    if (!Document.ParsedDocument.UserRegions.Any ())
+                if (node is ICompilationUnit)
+                {
+                    if (!Document.ParsedDocument.UserRegions.Any())
                         break;
-                    FoldingRegion reg = Document.ParsedDocument.UserRegions.Where (r => r.Region.Contains (loc.Line, loc.Column)).LastOrDefault ();
-                    if (reg == null) {
-                        entry = new PathEntry (GettextCatalog.GetString ("No region"));
-                    } else {
-                        entry = new PathEntry (CompilationUnitDataProvider.Pixbuf, reg.Name);
+                    FoldingRegion reg = Document.ParsedDocument.UserRegions.Where(r => r.Region.Contains(loc.Line, loc.Column)).LastOrDefault();
+                    if (reg == null)
+                    {
+                        entry = new PathEntry(GettextCatalog.GetString("No region"));
+                    }
+                    else
+                    {
+                        entry = new PathEntry(CompilationUnitDataProvider.Pixbuf, reg.Name);
                     }
                     entry.Position = EntryPosition.Right;
-                } else {
-                    entry = new PathEntry (ImageService.GetPixbuf (((IMember)node).StockIcon, IconSize.Menu), amb.GetString ((IMember)node, OutputFlags.IncludeGenerics | OutputFlags.IncludeParameters | OutputFlags.ReformatDelegates));
+                }
+                else
+                {
+                    entry = new PathEntry(ImageService.GetPixbuf(((IMember)node).StockIcon, IconSize.Menu), amb.GetString((IMember)node, OutputFlags.IncludeGenerics | OutputFlags.IncludeParameters | OutputFlags.ReformatDelegates));
                 }
                 entry.Tag = node;
-                result.Insert (0, entry);
+                result.Insert(0, entry);
                 node = node.Parent;
             }
-			
+
             PathEntry noSelection = null;
-            if (type == null) {
-                noSelection = new PathEntry (GettextCatalog.GetString ("No selection")) { Tag = new CustomNode (Document.CompilationUnit) };
-            } else if (member == null && type.ClassType != ClassType.Delegate) 
-                noSelection = new PathEntry (GettextCatalog.GetString ("No selection")) { Tag = new CustomNode (type) };
-            if (noSelection != null) {
-                result.Add (noSelection);
+            if (type == null)
+            {
+                noSelection = new PathEntry(GettextCatalog.GetString("No selection")) { Tag = new CustomNode(Document.CompilationUnit) };
             }
-			
+            else if (member == null && type.ClassType != ClassType.Delegate)
+                noSelection = new PathEntry(GettextCatalog.GetString("No selection")) { Tag = new CustomNode(type) };
+            if (noSelection != null)
+            {
+                result.Add(noSelection);
+            }
+
             var prev = CurrentPath;
-            CurrentPath = result.ToArray ();
-            OnPathChanged (new DocumentPathChangedEventArgs (prev));*/
+            CurrentPath = result.ToArray();
+            OnPathChanged(new DocumentPathChangedEventArgs(prev));*/
         }
 
         public override void Initialize()
@@ -444,15 +472,5 @@ namespace MonoDevelop.ValaBinding
             textEditorData.Caret.PositionChanged += UpdatePath;
             Document.DocumentParsed += delegate { UpdatePath(null, null); };
         }
-
-        // Yoinked from C# binding
-        // TODO: update for Xamarin Studio 5
-        /*class CustomNode : MonoDevelop.Projects.Dom.AbstractNode
-        {
-            public CustomNode (INode parent)
-            {
-                this.Parent = parent;
-            }
-        }*/
     }
 }
