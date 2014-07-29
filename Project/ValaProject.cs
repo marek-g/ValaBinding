@@ -105,7 +105,8 @@ namespace MonoDevelop.ValaBinding
                 (ValaProjectConfiguration)CreateConfiguration("Debug");
 
             configuration.DebugMode = true;
-            ((ValaCompilationParameters)configuration.CompilationParameters).DefineSymbols = "DEBUG MONODEVELOP";
+            ((ValaCompilationParameters)configuration.CompilationParameters).DefineSymbols = "DEBUG";
+            ((ValaCompilationParameters)configuration.CompilationParameters).ExtraCompilerArguments = "-g";
 
             Configurations.Add(configuration);
 
@@ -114,7 +115,7 @@ namespace MonoDevelop.ValaBinding
 
             configuration.DebugMode = false;
             ((ValaCompilationParameters)configuration.CompilationParameters).OptimizationLevel = 3;
-            ((ValaCompilationParameters)configuration.CompilationParameters).DefineSymbols = "MONODEVELOP";
+            ((ValaCompilationParameters)configuration.CompilationParameters).DefineSymbols = "";
             Configurations.Add(configuration);
 
             foreach (ValaProjectConfiguration c in Configurations)
