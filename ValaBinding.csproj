@@ -154,11 +154,15 @@
     </Reference>
     <Reference Include="Mono.Addins">
       <HintPath>..\..\..\..\usr\lib\monodevelop\bin\Mono.Addins.dll</HintPath>
+      <Private>False</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
     <None Include="ChangeLog" />
     <None Include="README" />
+    <None Include="MonoDevelop.ValaBinding.dll.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="ValaBinding.addin.xml" />
