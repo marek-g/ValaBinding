@@ -46,92 +46,115 @@
     <Reference Include="ICSharpCode.NRefactory">
       <HintPath>dlls\ICSharpCode.NRefactory.dll</HintPath>
       <Package>monodevelop</Package>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Mono.Addins, Version=0.6.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>dlls\Mono.Addins.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Mono.Cecil">
       <HintPath>dlls\Mono.Cecil.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Mono.Debugger.Soft">
       <HintPath>dlls\Mono.Debugger.Soft.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Mono.Debugging">
       <HintPath>dlls\Mono.Debugging.dll</HintPath>
       <Package>monodevelop</Package>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Mono.Debugging.Soft">
       <HintPath>dlls\Mono.Debugging.Soft.dll</HintPath>
       <Package>monodevelop-core-addins</Package>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Mono.TextEditor">
       <HintPath>dlls\Mono.TextEditor.dll</HintPath>
       <Package>monodevelop</Package>
+      <Private>False</Private>
     </Reference>
     <Reference Include="MonoDevelop.AspNet">
       <HintPath>dlls\MonoDevelop.AspNet.dll</HintPath>
       <Package>monodevelop-core-addins</Package>
+      <Private>False</Private>
     </Reference>
     <Reference Include="MonoDevelop.Autotools">
       <HintPath>dlls\MonoDevelop.Autotools.dll</HintPath>
       <Package>monodevelop-core-addins</Package>
+      <Private>False</Private>
     </Reference>
     <Reference Include="MonoDevelop.Core">
       <HintPath>dlls\MonoDevelop.Core.dll</HintPath>
       <Package>monodevelop</Package>
+      <Private>False</Private>
     </Reference>
     <Reference Include="MonoDevelop.CSharpBinding">
       <HintPath>dlls\MonoDevelop.CSharpBinding.dll</HintPath>
       <Package>monodevelop-core-addins</Package>
+      <Private>False</Private>
     </Reference>
     <Reference Include="MonoDevelop.Debugger">
       <HintPath>dlls\MonoDevelop.Debugger.dll</HintPath>
       <Package>monodevelop-core-addins</Package>
+      <Private>False</Private>
     </Reference>
     <Reference Include="MonoDevelop.Debugger.Soft">
       <HintPath>dlls\MonoDevelop.Debugger.Soft.dll</HintPath>
       <Package>monodevelop-core-addins</Package>
+      <Private>False</Private>
     </Reference>
     <Reference Include="MonoDevelop.Deployment">
       <HintPath>dlls\MonoDevelop.Deployment.dll</HintPath>
       <Package>monodevelop-core-addins</Package>
+      <Private>False</Private>
     </Reference>
     <Reference Include="MonoDevelop.Deployment.Linux">
       <HintPath>dlls\MonoDevelop.Deployment.Linux.dll</HintPath>
       <Package>monodevelop-core-addins</Package>
+      <Private>False</Private>
     </Reference>
     <Reference Include="MonoDevelop.DesignerSupport">
       <HintPath>dlls\MonoDevelop.DesignerSupport.dll</HintPath>
       <Package>monodevelop-core-addins</Package>
+      <Private>False</Private>
     </Reference>
     <Reference Include="MonoDevelop.Gettext">
       <HintPath>dlls\MonoDevelop.Gettext.dll</HintPath>
       <Package>monodevelop-core-addins</Package>
+      <Private>False</Private>
     </Reference>
     <Reference Include="MonoDevelop.GtkCore">
       <HintPath>dlls\MonoDevelop.GtkCore.dll</HintPath>
       <Package>monodevelop-core-addins</Package>
+      <Private>False</Private>
     </Reference>
     <Reference Include="MonoDevelop.Ide">
       <HintPath>dlls\MonoDevelop.Ide.dll</HintPath>
       <Package>monodevelop</Package>
+      <Private>False</Private>
     </Reference>
     <Reference Include="MonoDevelop.NUnit">
       <HintPath>dlls\MonoDevelop.NUnit.dll</HintPath>
       <Package>monodevelop-core-addins</Package>
+      <Private>False</Private>
     </Reference>
     <Reference Include="MonoDevelop.Refactoring">
       <HintPath>dlls\MonoDevelop.Refactoring.dll</HintPath>
       <Package>monodevelop-core-addins</Package>
+      <Private>False</Private>
     </Reference>
     <Reference Include="MonoDevelop.SourceEditor2">
       <HintPath>dlls\MonoDevelop.SourceEditor2.dll</HintPath>
       <Package>monodevelop-core-addins</Package>
+      <Private>False</Private>
     </Reference>
     <Reference Include="MonoDevelop.VBNetBinding">
       <HintPath>dlls\MonoDevelop.VBNetBinding.dll</HintPath>
       <Package>monodevelop-core-addins</Package>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Xml" />
@@ -155,6 +178,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>dlls\Xwt.dll</HintPath>
       <Package>monodevelop</Package>
+      <Private>False</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
