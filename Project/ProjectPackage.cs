@@ -329,6 +329,7 @@ namespace MonoDevelop.ValaBinding
             string pkg_var = Environment.GetEnvironmentVariable("PKG_CONFIG_PATH");
             string[] staticPaths = { "/usr/lib/pkgconfig",
 				"/usr/lib64/pkgconfig",
+				"/usr/lib/x86_64-linux-gnu/pkgconfig",
 				"/usr/share/pkgconfig",
 				"/usr/local/lib/pkgconfig",
 				"/usr/local/share/pkgconfig"

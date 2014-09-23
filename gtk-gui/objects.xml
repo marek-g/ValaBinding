@@ -329,34 +329,4 @@
     <itemgroups />
     <signals />
   </object>
-  <object type="MonoDevelop.VersionControl.CommitMessageStylePanelWidget" palette-category="General" allow-children="false" base-type="Gtk.Bin">
-    <itemgroups />
-    <signals>
-      <itemgroup label="CommitMessageStylePanelWidget Signals">
-        <signal name="Changed" />
-      </itemgroup>
-    </signals>
-  </object>
-  <object type="MonoDevelop.VersionControl.Views.ComparisonWidget" palette-category="General" allow-children="false" base-type="Gtk.Bin">
-    <itemgroups />
-    <signals />
-  </object>
-  <object type="MonoDevelop.VersionControl.Views.DropDownBox" palette-category="Widgets" allow-children="false" base-type="Gtk.Button">
-    <itemgroups>
-      <itemgroup label="DropDownBox Properties">
-        <property name="Text" />
-        <property name="DefaultIconHeight" />
-        <property name="DefaultIconWidth" />
-      </itemgroup>
-    </itemgroups>
-    <signals />
-  </object>
-  <object type="MonoDevelop.VersionControl.Views.ChangeSetView" palette-category="General" allow-children="false" base-type="Gtk.ScrolledWindow">
-    <itemgroups />
-    <signals />
-  </object>
-  <object type="MonoDevelop.VersionControl.Views.LogWidget" palette-category="General" allow-children="false" base-type="Gtk.Bin">
-    <itemgroups />
-    <signals />
-  </object>
 </objects>
