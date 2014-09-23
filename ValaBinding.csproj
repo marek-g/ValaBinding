@@ -47,6 +47,10 @@
       <HintPath>dlls\ICSharpCode.NRefactory.dll</HintPath>
       <Package>monodevelop</Package>
     </Reference>
+    <Reference Include="Mono.Addins, Version=0.6.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>dlls\Mono.Addins.dll</HintPath>
+    </Reference>
     <Reference Include="Mono.Cecil">
       <HintPath>dlls\Mono.Cecil.dll</HintPath>
     </Reference>
@@ -151,10 +155,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>dlls\Xwt.dll</HintPath>
       <Package>monodevelop</Package>
-    </Reference>
-    <Reference Include="Mono.Addins">
-      <HintPath>..\..\..\..\usr\lib\monodevelop\bin\Mono.Addins.dll</HintPath>
-      <Private>False</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
